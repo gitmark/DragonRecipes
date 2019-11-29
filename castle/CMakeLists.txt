@@ -59,7 +59,12 @@ else()
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../build/dragonrecipes)
 endif()
 
+if(WIN32)
+elseif(MACOS)
+SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -rpath $ENV{HOME}/Qt/5.12.6/${comp}_64/lib")
+else()
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wl,-rpath,$ENV{HOME}/Qt/5.12.6/${comp}_64/lib")
+endif()
 
 add_executable(castle ${UI_FILES} ${SRC_FILES} ${HEADER_FILES} ${QRC_FILES})
 
