@@ -15,6 +15,10 @@ cmake_minimum_required(VERSION 3.0)
 # Set the name of the project. The major version number is appended to the 
 # base name.
 # ----------------------------------------------------------------------------
+#https://stackoverflow.com/questions/27660048/cmake-check-if-mac-os-x-use-apple-or-apple
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(MACOS TRUE)
+endif()
 
 set(maj_ver 0)
 set(min_ver 0)
@@ -24,6 +28,13 @@ set(full_ver ${maj_ver}.${min_ver}.${patch_ver})
 set(base_name dragonrecipes)
 set(name ${base_name}${maj_ver})
 project(${name})
+if(WIN32)
+set(ext lib)
+elseif(MACOS)
+set(ext dylib)
+else()
+set(ext so)
+endif()
 
 # ----------------------------------------------------------------------------
 # Turn off RPATH for the library install name on macOS.
@@ -134,12 +145,17 @@ ${CMAKE_INSTALL_PREFIX}/${base_name}/${full_ver}
 ${CMAKE_INSTALL_PREFIX}/${base_name}/${maj_ver} )" )
 
 INSTALL(CODE "execute_process(COMMAND ln -nsf
-${CMAKE_INSTALL_PREFIX}/${base_name}/${maj_ver}/lib/lib${name}.dylib 
-${CMAKE_INSTALL_PREFIX}/${base_name}/lib/lib${name}.dylib )" )
+${CMAKE_INSTALL_PREFIX}/${base_name}/${maj_ver}/lib/lib${name}.${ext} 
+${CMAKE_INSTALL_PREFIX}/${base_name}/lib/lib${name}.${ext} )" )
 
 INSTALL(CODE "execute_process(COMMAND ln -nsf 
-${CMAKE_INSTALL_PREFIX}/${base_name}/lib/lib${name}.dylib 
-${CMAKE_INSTALL_PREFIX}/lib/lib${name}.dylib )" )
+${CMAKE_INSTALL_PREFIX}/${base_name}/lib/lib${name}.${ext} 
+${CMAKE_INSTALL_PREFIX}/lib/lib${name}.${ext} )" )
 
+if(WIN32)
+elseif(MACOS)
+else()
+INSTALL(CODE "execute_process(COMMAND ldconfig /usr/local/lib)")
+endif()
 
 

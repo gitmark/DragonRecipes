@@ -3,10 +3,23 @@ cmake_minimum_required(VERSION 3.1.0)
 set(name castle)
 project(${name})
 
+#https://stackoverflow.com/questions/27660048/cmake-check-if-mac-os-x-use-apple-or-apple
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(MACOS TRUE)
+endif()
+
+if(WIN32)
+set(comp msc)
+elseif(MACOS)
+set(comp clang)
+else()
+set(comp gcc)
+endif()
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-set(Qt5_DIR "~/Qt/5.12.6/clang_64/lib/cmake/Qt5")
+set(Qt5_DIR "$ENV{HOME}/Qt/5.12.6/${comp}_64/lib/cmake/Qt5")
 
 if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -46,7 +59,7 @@ else()
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../build/dragonrecipes)
 endif()
 
-SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -rpath /Users/mark/Qt/5.12.6/clang_64/lib")
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wl,-rpath,$ENV{HOME}/Qt/5.12.6/${comp}_64/lib")
 
 add_executable(castle ${UI_FILES} ${SRC_FILES} ${HEADER_FILES} ${QRC_FILES})
 
@@ -66,4 +79,5 @@ endif()
 # ----------------------------------------------------------------------------
 install(TARGETS ${name}
 	RUNTIME DESTINATION bin)
+
 
