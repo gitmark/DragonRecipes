@@ -16,8 +16,8 @@ cp -R $qtlib/QtWidgets.framework $dest/
 cp -R $qtlib/QtCore.framework $dest/
 cp -R $qtlib/QtGui.framework $dest/
 
-#cp -R $qtlib/QtPrintSupport.framework $dest/
-#cp -R $qtlib/QtDBus.framework $dest/
+cp -R $qtlib/QtPrintSupport.framework $dest/
+cp -R $qtlib/QtDBus.framework $dest/
 
 mkdir -p $bundle/Contents/plugins/platforms
 cp -R $qtplugins/platforms/libqcocoa* $bundle/Contents/plugins/platforms/
