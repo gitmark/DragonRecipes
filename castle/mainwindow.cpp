@@ -6,12 +6,15 @@
 #include "ui_mainwindow.h"
 
 #include <QMessageBox>
+#include <QDir>
+#include <QApplication>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    loadPlugins();
 }
 
 MainWindow::~MainWindow()
@@ -34,4 +37,19 @@ void MainWindow::on_pushButton_clicked()
 
     ui->textEditResults->setText(ss.str().c_str());
  //   QMessageBox::information(this,tr("my ap"),tr("hello"), QMessageBox::Ok);
+}
+
+void MainWindow::loadPlugins()
+{
+    /*
+    QDir pluginDir(QApplication::applicationDirPath());
+#if defined(Q_OS_WIN)
+    if (pluginDir.dirName().toLower() == "debug" || pluginDir.dirName().toLower() == "release")
+        pluginDir.cdUp();
+#eldif defined(Q_OS_MAC)
+    if (pluginDir.dirName() == "MacOS") {
+        pluginDir.cdUp();
+    }
+#endif
+     */
 }

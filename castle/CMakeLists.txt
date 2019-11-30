@@ -70,6 +70,12 @@ add_executable(castle ${UI_FILES} ${SRC_FILES} ${HEADER_FILES} ${QRC_FILES})
 
 target_link_libraries(castle Qt5::Widgets)
 
+add_custom_command(TARGET ${name}
+POST_BUILD
+COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/make-bundle.sh 
+${CMAKE_CURRENT_SOURCE_DIR}
+${CMAKE_CURRENT_BINARY_DIR})
+
 # ----------------------------------------------------------------------------
 # Link the app with the library
 # ----------------------------------------------------------------------------
@@ -84,5 +90,9 @@ endif()
 # ----------------------------------------------------------------------------
 install(TARGETS ${name}
 	RUNTIME DESTINATION bin)
+
+INSTALL(CODE "execute_process(COMMAND cp -a 
+${CMAKE_CURRENT_BINARY_DIR}/Castle.app
+/Applications/)" )
 
 

@@ -20,7 +20,8 @@ public:
 
 protected:
     std::shared_ptr<Production> production;
-
+    void loadPlugins();
+    
 private slots:
     void on_pushButton_clicked();
 
