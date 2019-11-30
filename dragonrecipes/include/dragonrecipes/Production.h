@@ -33,6 +33,9 @@ class ProductionPrivate;
     protected:
         std::unique_ptr<ProductionPrivate> data;
     };
+
+    typedef std::shared_ptr<Production> ProdPtr;
 }
+
 
 #endif
