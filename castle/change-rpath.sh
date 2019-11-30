@@ -27,12 +27,14 @@ install_name_tool -id @executable_path/../$qtcore $bundle/Contents/$qtcore
 qtgui=Frameworks/QtGui.framework/Versions/5/QtGui
 install_name_tool -id @executable_path/../$qtgui $bundle/Contents/$qtgui
 
-
 qtdbus=Frameworks/QtDBus.framework/Versions/5/QtDBus
 install_name_tool -id @executable_path/../$qtdbus $bundle/Contents/$qtdbus
 
 qtprintsupport=Frameworks/QtPrintSupport.framework/Versions/5/QtPrintSupport
 install_name_tool -id @executable_path/../$qtprintsupport $bundle/Contents/$qtprintsupport
+
+qtsvg=Frameworks/QtSvg.framework/Versions/5/QtSvg
+install_name_tool -id @executable_path/../$qtsvg $bundle/Contents/$qtsvg
 
 
 install_name_tool -change @rpath/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../$qtwidgets $bundle/Contents/MacOS/castle
@@ -72,9 +74,6 @@ install_name_tool -change @rpath/QtDBus.framework/Versions/5/QtDBus @executable_
 install_name_tool -change @rpath/QtPrintSupport.framework/Versions/5/QtPrintSupport @executable_path/../$qtprintsupport $cocoa
 
 
-
-
-
 for f in $bundle/Contents/plugins/imageformats/*.dylib
 do
     echo "f = $f"
@@ -83,5 +82,19 @@ do
     install_name_tool -change @rpath/QtGui.framework/Versions/5/QtGui @executable_path/../$qtgui $f
     install_name_tool -change @rpath/QtCore.framework/Versions/5/QtCore @executable_path/../$qtcore $f
     install_name_tool -change @rpath/QtDBus.framework/Versions/5/QtDBus @executable_path/../$qtdbus $f
+    install_name_tool -change @rpath/QtSvg.framework/Versions/5/QtSvg @executable_path/../$qtsvg $f
     install_name_tool -change @rpath/QtPrintSupport.framework/Versions/5/QtPrintSupport @executable_path/../$qtprintsupport $f
 done
+
+for f in $bundle/Contents/plugins/styles/*.dylib
+do
+    echo "f = $f"
+    echo "f short = ${f##*/}"
+    install_name_tool -change @rpath/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../$qtwidgets $f
+    install_name_tool -change @rpath/QtGui.framework/Versions/5/QtGui @executable_path/../$qtgui $f
+    install_name_tool -change @rpath/QtCore.framework/Versions/5/QtCore @executable_path/../$qtcore $f
+    install_name_tool -change @rpath/QtDBus.framework/Versions/5/QtDBus @executable_path/../$qtdbus $f
+    install_name_tool -change @rpath/QtSvg.framework/Versions/5/QtSvg @executable_path/../$qtsvg $f
+    install_name_tool -change @rpath/QtPrintSupport.framework/Versions/5/QtPrintSupport @executable_path/../$qtprintsupport $f
+done
+

@@ -91,7 +91,11 @@ endif()
 install(TARGETS ${name}
 	RUNTIME DESTINATION bin)
 
-INSTALL(CODE "execute_process(COMMAND cp -a 
+
+INSTALL(CODE "execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/uninstall-castle.sh)" )
+
+
+INSTALL(CODE "execute_process(COMMAND cp -a
 ${CMAKE_CURRENT_BINARY_DIR}/Castle.app
 /Applications/)" )
 

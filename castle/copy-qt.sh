@@ -18,11 +18,13 @@ cp -R $qtlib/QtGui.framework $dest/
 
 cp -R $qtlib/QtPrintSupport.framework $dest/
 cp -R $qtlib/QtDBus.framework $dest/
+cp -R $qtlib/QtSvg.framework $dest/
 
 mkdir -p $bundle/Contents/plugins/platforms
 cp -R $qtplugins/platforms/libqcocoa* $bundle/Contents/plugins/platforms/
 
 cp -R $qtplugins/imageformats $bundle/Contents/plugins/
+cp -R $qtplugins/styles $bundle/Contents/plugins/
 
 
 
