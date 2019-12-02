@@ -74,9 +74,20 @@ endif()
 
 add_executable(castle ${UI_FILES} ${SRC_FILES} ${HEADER_FILES} ${QRC_FILES})
 
+set_target_properties( castle
+	PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Castle.app/Contents/MacOS"
+)
+
 target_link_libraries(castle Qt5::Widgets)
 
 if(MACOS)
+add_custom_command(TARGET ${name}
+PRE_BUILD
+COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/pre-build.sh
+${CMAKE_CURRENT_SOURCE_DIR}
+${CMAKE_CURRENT_BINARY_DIR})
+
 add_custom_command(TARGET ${name}
 POST_BUILD
 COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/make-bundle.sh
