@@ -25,7 +25,7 @@ cp -a $srcBundle $destBundle
 cd $src/icon
 ./compile-icon.sh $dest $destBundle
 cp $dest/castle $destBundle/Contents/MacOS/
-cp $dest/../dragonrecipes/libdragonrecipes0.dylib $destBundle/Contents/Resources/
+cp $dest/../DragonRecipes/libdragonrecipes0.dylib $destBundle/Contents/Resources/
 
 cd $src
 

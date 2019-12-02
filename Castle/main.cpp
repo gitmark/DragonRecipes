@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     dir.cdUp();
     dir.cd("plugins");
     QCoreApplication::setLibraryPaths(QStringList(dir.absolutePath()));
-    a.setWindowIcon(QIcon(":/images/AppIcon.icns"));
+    a.setWindowIcon(QIcon(":/images/castle.icns"));
     MainWindow w;
     w.show();
     return a.exec();

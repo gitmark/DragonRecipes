@@ -3,6 +3,6 @@
  distributed under the MIT License. See LICENSE.TXT for details.
 --------------------------------------------------------------------------*/
 
-#include "dragonrecipes/Production.h"
-#include "dragonrecipes/StringTools.h"
+#include "DragonRecipes/Production.h"
+#include "DragonRecipes/StringTools.h"
 

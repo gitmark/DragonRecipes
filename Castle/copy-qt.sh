@@ -10,6 +10,11 @@ fi
 qtlib=$HOME/Qt/5.12.6/clang_64/lib
 qtplugins=$HOME/Qt/5.12.6/clang_64/plugins
 dest=$bundle/Contents/Frameworks
+
+if [ -e $dest ]; then
+    rm -rf $dest
+fi
+
 mkdir -p $dest
 
 cp -R $qtlib/QtWidgets.framework $dest/

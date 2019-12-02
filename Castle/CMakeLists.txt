@@ -50,13 +50,13 @@ FILE (GLOB QRC_FILES *.qrc)
 # ----------------------------------------------------------------------------
 # Set the include and link search directories
 # ----------------------------------------------------------------------------
-include_directories(../dragonrecipes/include)
+include_directories(../DragonRecipes/include)
 #include_directories(/usr/local/include)
 if (CMAKE_GENERATOR MATCHES "Unix Makefiles")
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../build/dragonrecipes)
+link_directories(${CMAKE_BINARY_DIR}/DragonRecipes)
 #link_directories(/usr/local/lib)
 else()
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../build/dragonrecipes)
+link_directories(${CMAKE_BINARY_DIR}/DragonRecipes)
 endif()
 
 if(WIN32)
@@ -72,7 +72,7 @@ target_link_libraries(castle Qt5::Widgets)
 
 add_custom_command(TARGET ${name}
 POST_BUILD
-COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/make-bundle.sh 
+COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/make-bundle.sh
 ${CMAKE_CURRENT_SOURCE_DIR}
 ${CMAKE_CURRENT_BINARY_DIR})
 

@@ -39,10 +39,11 @@ cp -a Assets.xcassets $srcIcon
 
 srcIconSetDir=$srcIcon/Assets.xcassets/AppIcon.appiconset
 export dir=`pwd`
+
 pushd $srcIconSetDir
 $dir/resize-squares.sh $image castle
+$dir/create-icon.sh castle
 popd
-
 
 pushd $srcIcon
 $dir/make-assets-car.sh $destIcon
