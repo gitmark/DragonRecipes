@@ -10,9 +10,10 @@
 #include <vector>
 #include <sstream>
 
-#include "dragonrecipes/Constants.h"
+#include <DragonRecipes/Constants.h>
 
-namespace dr {
+namespace dragon {
+
 inline std::string trim(const std::string &str) {
     if (!str.size())
         return str;

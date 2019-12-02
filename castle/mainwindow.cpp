@@ -1,20 +1,28 @@
+/*--------------------------------------------------------------------------
+   Copyright (c) 2019 Mark Elrod. All rights reserved. This file is
+   distributed under the MIT License. See LICENSE.TXT for details.
+  --------------------------------------------------------------------------*/
+
 #include <vector>
 #include <string>
 #include <sstream>
-
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
-
+#include <memory>
 #include <QMessageBox>
 #include <QDir>
 #include <QApplication>
+#include <DragonRecipes/Symbol.h>
+#include <DragonRecipes/Grammar.h>
+#include <DragonRecipes/Token.h>
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+
+using namespace dragon;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    loadPlugins();
 }
 
 MainWindow::~MainWindow()
@@ -22,34 +30,40 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
 void MainWindow::on_pushButton_clicked()
 {
+    std::vector<SymbolPtr> terminals;
+
+    terminals.push_back(newTerm("a", 1));
+    terminals.push_back(newTerm("b", 2));
+    terminals.push_back(newTerm("c", 3));
+
+    std::vector<SymbolPtr> nonterminals;
+
+    nonterminals.push_back(newNonterm("A", 101));
+    nonterminals.push_back(newNonterm("B", 102));
+    nonterminals.push_back(newNonterm("C", 103));
+
+    GrammarPtr grammar = newGrammar();
+
+    grammar->setTerminals(terminals);
+    grammar->setNonterminals(nonterminals);
+    grammar->add(newProduction("A", "a A"));
+    grammar->add(newProduction("A", "b A"));
+    grammar->add(newProduction("B", "c"));
+    grammar->setStartSymbol("A");
+    grammar->updateMembers();
+
     std::string head = ui->lineEditHead->text().toStdString();
     std::string body = ui->lineEditBody->text().toStdString();
     production = std::make_shared<Production>(head, body);
-    std::vector<std::string> parts = production->body();
+    std::vector<std::string> parts = production->bodyVec();
     std::stringstream ss;
     ss << production->head() << "\n\n";
     for(auto p : parts) {
         ss << p << "\n";
     }
 
-    ui->textEditResults->setText(ss.str().c_str());
- //   QMessageBox::information(this,tr("my ap"),tr("hello"), QMessageBox::Ok);
+    ui->textEditResults->setText(grammar->toString().c_str());
 }
 
-void MainWindow::loadPlugins()
-{
-    /*
-    QDir pluginDir(QApplication::applicationDirPath());
-#if defined(Q_OS_WIN)
-    if (pluginDir.dirName().toLower() == "debug" || pluginDir.dirName().toLower() == "release")
-        pluginDir.cdUp();
-#eldif defined(Q_OS_MAC)
-    if (pluginDir.dirName() == "MacOS") {
-        pluginDir.cdUp();
-    }
-#endif
-     */
-}

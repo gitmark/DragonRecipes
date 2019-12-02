@@ -78,12 +78,17 @@ FILE (GLOB SRC_FILES src/*.cpp)
 # ----------------------------------------------------------------------------
 # Set the list of include files.
 # ----------------------------------------------------------------------------
-FILE (GLOB HEADER_FILES include/*.h include/${base_name}/*.h)
+FILE (GLOB HEADER_FILES include/*.h include/DragonRecipes/*.h)
+
+# ----------------------------------------------------------------------------
+# Set the list of private include files.
+# ----------------------------------------------------------------------------
+FILE (GLOB PRIVATE_HEADER_FILES include/PrivateHeaders/*.h)
 
 # ----------------------------------------------------------------------------
 # Create the shared library.
 # ----------------------------------------------------------------------------
-add_library(${name} SHARED ${SRC_FILES} ${HEADER_FILES})
+add_library(${name} SHARED ${SRC_FILES} ${HEADER_FILES} ${PRIVATE_HEADER_FILES})
 
 # ----------------------------------------------------------------------------
 # Set the library's install name directory for macOS.
@@ -137,8 +142,8 @@ ${CMAKE_INSTALL_PREFIX}/${base_name}/${maj_ver}/include/${base_name}
 ${CMAKE_INSTALL_PREFIX}/include/${base_name} )" )
 
 INSTALL(CODE "execute_process(COMMAND ln -nsf 
-${CMAKE_INSTALL_PREFIX}/${base_name}/${maj_ver}/include/dragonrecipes.h
-${CMAKE_INSTALL_PREFIX}/include/dragonrecipes.h )" )
+${CMAKE_INSTALL_PREFIX}/${base_name}/${maj_ver}/include/DragonRecipes.h
+${CMAKE_INSTALL_PREFIX}/include/DragonRecipes.h )" )
 
 INSTALL(CODE "execute_process(COMMAND ln -nsf 
 ${CMAKE_INSTALL_PREFIX}/${base_name}/${full_ver} 

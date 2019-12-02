@@ -4,16 +4,13 @@
 --------------------------------------------------------------------------*/
 
 #include <iostream>
-#include <DragonRecipes.h>
-
-using namespace dragon;
-
-int main(int argc, const char *argv[]) {
-    Production p("a", "b");
-    p.print(std::cout);
-    std::cout << "\n";
-	std::cout << "hello\n";
-	return 0;
-}
+#include <PrivateHeaders/SymbolPrivate.h>
+#include <DragonRecipes/StringTools.h>
 
 
+namespace dragon
+    {
+
+    const char *SymbolPrivate::typeStrings[SYMBOL_TYPE_COUNT] = { "unknown", "terminal", "nonterminal" };
+
+    }

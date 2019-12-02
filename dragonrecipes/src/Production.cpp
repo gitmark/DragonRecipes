@@ -4,11 +4,12 @@
 --------------------------------------------------------------------------*/
 
 #include <iostream>
-#include "dragonrecipes/Production.h"
-#include "dragonrecipes/StringTools.h"
+#include "DragonRecipes/Production.h"
+#include "DragonRecipes/StringTools.h"
 
-namespace dr
+namespace dragon
     {
+
     class ProductionPrivate
     {
     public:
@@ -27,11 +28,11 @@ namespace dr
     Production::~Production() {
     }
     
-    std::vector<std::string> Production::body() {
+    std::vector<std::string> Production::bodyVec() {
         return data->body;
     }
 
-    std::string Production::bodyString() {
+    std::string Production::body() {
         return join(data->body, " ");
     }
 
@@ -41,7 +42,7 @@ namespace dr
     
     void Production::print(std::ostream &os)
     {
-        os << data->head << " -> " << bodyString();
+        os << data->head << " -> " << body();
     }
     
     std::string Production::toString() {

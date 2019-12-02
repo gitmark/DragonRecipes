@@ -9,31 +9,57 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <set>
+#include <map>
+#include <DragonRecipes/Constants.h>
+#include <DragonRecipes/Symbol.h>
+#include <DragonRecipes/Token.h>
+#include <DragonRecipes/Production.h>
 
-#include <dragonrecipes/Constants.h>
-
-namespace dr
+namespace dragon
 {
+
 class GrammarPrivate;
 
     class DRAGON_EXPORT Grammar
     {
     public:
         Grammar();
-        Grammar(const Grammar&) = delete;
-        Grammar(Grammar&&) = delete;
         virtual ~Grammar();
 
-        void add(const std::string &head, const std::string &body);
-        std::vector<std::string> FIRST();
-        std::vector<std::string> FOLLOW();
+        void add(std::shared_ptr<Production> production);
+        void add(std::shared_ptr<Symbol> symbol);
 
-        void print(std::ostream &os);
-        std::string toString();
+        int first(const std::string &x, std::set<std::string> &first);
+        void print(std::ostream &os) const;
+        std::string toString() const;
+
+        const std::vector<std::string> &nontermVec() const;
+        const std::vector<std::string> &termVec() const;
+        const std::set<std::string> &nontermSet() const;
+        const std::set<std::string> &termSet() const;
+
+        int tokenId(const std::string &token) const;
+        std::string tokenString(int id) const;
+
+        int tokenType(int id) const;
+        int tokenType(const std::string &token) const;
+
+        void setTerminals(const std::vector<SymbolPtr> &terminals);
+        void setNonterminals(const std::vector<SymbolPtr> &nonterminals);
+        void setProductions(const std::map<std::string, std::vector<ProdPtr>> &productions);
+        void setStartSymbol(const std::string& symbol);
+        void updateMembers();
 
     protected:
         std::unique_ptr<GrammarPrivate> data;
     };
+
+    typedef std::shared_ptr<Grammar> GrammarPtr;
+
+    inline GrammarPtr newGrammar() {
+        return std::make_shared<Grammar>();
+    }
 }
 
 #endif

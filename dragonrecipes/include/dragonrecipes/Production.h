@@ -9,11 +9,11 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <DragonRecipes/Constants.h>
 
-#include "dragonrecipes/Constants.h"
-
-namespace dr
+namespace dragon
 {
+
 class ProductionPrivate;
 
     class DRAGON_EXPORT Production
@@ -24,8 +24,8 @@ class ProductionPrivate;
         Production(Production&&) = delete;
         virtual ~Production();
         
-        std::vector<std::string> body();
-        std::string bodyString();
+        std::vector<std::string> bodyVec();
+        std::string body();
         std::string head();
         void print(std::ostream &os);
         std::string toString();
@@ -35,6 +35,10 @@ class ProductionPrivate;
     };
 
     typedef std::shared_ptr<Production> ProdPtr;
+
+    inline ProdPtr newProduction(const std::string &head, const std::string &body) {
+        return std::make_shared<Production>(head,body);
+    }
 }
 
 

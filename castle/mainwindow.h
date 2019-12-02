@@ -1,10 +1,16 @@
+/*--------------------------------------------------------------------------
+   Copyright (c) 2019 Mark Elrod. All rights reserved. This file is
+   distributed under the MIT License. See LICENSE.TXT for details.
+  --------------------------------------------------------------------------*/
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <memory>
 #include <QMainWindow>
-#include <dragonrecipes.h>
-using namespace dr;
+#include <DragonRecipes.h>
+
+using namespace dragon;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,12 +26,13 @@ public:
 
 protected:
     std::shared_ptr<Production> production;
-    void loadPlugins();
-    
+
 private slots:
     void on_pushButton_clicked();
 
 private:
     Ui::MainWindow *ui;
 };
-#endif // MAINWINDOW_H
+
+#endif
+

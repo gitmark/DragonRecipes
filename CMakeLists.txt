@@ -14,7 +14,7 @@ cmake_minimum_required(VERSION 3.0)
 # ----------------------------------------------------------------------------
 # Set the name of the project. 
 # ----------------------------------------------------------------------------
-set(name "dragonproject")
+set(name "DragonProject")
 project(${name})
 
 # ----------------------------------------------------------------------------
@@ -22,9 +22,9 @@ project(${name})
 # ----------------------------------------------------------------------------
 set(CMAKE_MACOSX_RPATH OFF)
 
-add_subdirectory(dragonrecipes)
-add_subdirectory(knight)
-add_subdirectory(castle)
+add_subdirectory(DragonRecipes)
+add_subdirectory(Knight)
+add_subdirectory(Castle)
 
 add_dependencies(knight dragonrecipes0)
 add_dependencies(castle dragonrecipes0)
