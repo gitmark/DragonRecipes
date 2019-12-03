@@ -52,7 +52,7 @@ class GrammarPrivate;
         void updateMembers();
 
     protected:
-        std::unique_ptr<GrammarPrivate> data;
+        UniquePtr<GrammarPrivate> data;
     };
 
     typedef std::shared_ptr<Grammar> GrammarPtr;
@@ -60,6 +60,9 @@ class GrammarPrivate;
     inline GrammarPtr newGrammar() {
         return std::make_shared<Grammar>();
     }
+	
+
+			
 }
 
 #endif

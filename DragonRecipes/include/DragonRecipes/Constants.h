@@ -24,5 +24,55 @@
     #endif
 #endif
 
-#endif
+namespace dragon {
+	template <class T>
+class DRAGON_EXPORT UniquePtr {
+	public:
+	UniquePtr(T* ptr) : ptr(ptr) {
+	}
 
+	/*
+	UniquePtr(UniquePtr<T> &p) {
+		T *tmp = p.ptr;
+		p.ptr = ptr;
+		ptr = tmp;
+	}
+*/
+	
+	
+	~UniquePtr();
+	
+	T *&get() {
+		return ptr;
+	}
+
+	T * const&get() const {
+		return ptr;
+	}
+	
+		T *operator->() {
+		return ptr;
+	}
+
+	T * const operator->() const {
+		return ptr;
+	}
+	
+	
+	private:
+	T *ptr;
+};
+
+
+#define UNIQUE_PTR_IMPL(a)\
+			template<>\
+	UniquePtr<a>::~UniquePtr() {\
+		delete ptr;\
+		ptr = nullptr;\
+	}
+
+	
+	
+}
+
+#endif

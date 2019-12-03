@@ -88,6 +88,8 @@ namespace dragon
         std::string startSymbol;
     };
 
+	UNIQUE_PTR_IMPL(GrammarPrivate)
+	
     Grammar::Grammar() :
     data(new GrammarPrivate()) {}
 

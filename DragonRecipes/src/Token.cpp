@@ -30,7 +30,7 @@ namespace dragon
     };
     
     Token::Token(const std::string &name, int id, int line, int col) :
-        Symbol(std::make_unique<TokenPrivate>(name, id, line, col)) {
+        Symbol(new TokenPrivate(name, id, line, col)) {
     }
 
     Token::~Token() {

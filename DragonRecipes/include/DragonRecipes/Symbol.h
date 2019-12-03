@@ -14,7 +14,13 @@
 namespace dragon
 {
 
+
 class SymbolPrivate;
+
+
+
+
+
 
     class DRAGON_EXPORT Symbol
     {
@@ -22,7 +28,7 @@ class SymbolPrivate;
         enum Type {unknown, term, nonterm};
 
         Symbol(const std::string &name = "", int id = 0, Type type = unknown);
-        Symbol(std::unique_ptr<SymbolPrivate> &&ptr);
+		Symbol::Symbol(UniquePtr<SymbolPrivate> &&ptr);
         virtual ~Symbol();
         
         int id() const;
@@ -37,11 +43,15 @@ class SymbolPrivate;
         void print(std::ostream &os) const;
         std::string toString() const;
  
+
     protected:
-        std::unique_ptr<SymbolPrivate> data;
+        UniquePtr<SymbolPrivate> data;
     };
 
+
     typedef std::shared_ptr<Symbol> SymbolPtr;
+
+
 
     inline SymbolPtr newSymbol(const std::string &name = "", int id = 0, Symbol::Type type = Symbol::unknown) {
         return std::make_shared<Symbol>(name, id, type);

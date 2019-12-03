@@ -22,6 +22,8 @@ namespace dragon
         std::vector<std::string> body;
     };
     
+	UNIQUE_PTR_IMPL(ProductionPrivate)
+	
     Production::Production(const std::string &head, const std::string &body) :
     data(new ProductionPrivate(head, body)) {}
     

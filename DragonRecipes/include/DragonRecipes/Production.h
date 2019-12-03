@@ -31,7 +31,7 @@ class ProductionPrivate;
         std::string toString();
  
     protected:
-        std::unique_ptr<ProductionPrivate> data;
+        UniquePtr<ProductionPrivate> data;
     };
 
     typedef std::shared_ptr<Production> ProdPtr;

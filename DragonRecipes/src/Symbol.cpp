@@ -10,11 +10,12 @@
 
 namespace dragon
     {
-
+	UNIQUE_PTR_IMPL(SymbolPrivate)
+	
     Symbol::Symbol(const std::string &name, int id, Type type) :
         data(new SymbolPrivate(name, id, type)) {}
 
-    Symbol::Symbol(std::unique_ptr<SymbolPrivate> &&ptr) :
+    Symbol::Symbol(UniquePtr<SymbolPrivate> &&ptr) :
         data(std::move(ptr)) {}
 
     Symbol::~Symbol() {

@@ -8,18 +8,23 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(MACOS TRUE)
 endif()
 
+
 if(WIN32)
-set(comp msc)
+set(comp msvc2017)
+set(basedir "C:")
 elseif(MACOS)
 set(comp clang)
+set(basedir "$ENV{HOME}")
 else()
 set(comp gcc)
+set(basedir "$ENV{HOME}")
 endif()
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-set(Qt5_DIR "$ENV{HOME}/Qt/5.12.6/${comp}_64/lib/cmake/Qt5")
+message("${basedir}/Qt/5.12.6/${comp}_64/lib/cmake/Qt5")
+set(Qt5_DIR "${basedir}/Qt/5.12.6/${comp}_64/lib/cmake/Qt5")
 
 if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -60,6 +65,7 @@ link_directories(${CMAKE_BINARY_DIR}/DragonRecipes)
 endif()
 
 if(WIN32)
+    set(CMAKE_CXX_FLAGS "/std:c++14 /EHsc ${CMAKE_CXX_FLAGS}")
 elseif(MACOS)
 SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -rpath $ENV{HOME}/Qt/5.12.6/${comp}_64/lib")
 else()
@@ -70,11 +76,13 @@ add_executable(castle ${UI_FILES} ${SRC_FILES} ${HEADER_FILES} ${QRC_FILES})
 
 target_link_libraries(castle Qt5::Widgets)
 
+if(MACOS)
 add_custom_command(TARGET ${name}
 POST_BUILD
 COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/make-bundle.sh
 ${CMAKE_CURRENT_SOURCE_DIR}
 ${CMAKE_CURRENT_BINARY_DIR})
+endif()
 
 # ----------------------------------------------------------------------------
 # Link the app with the library
