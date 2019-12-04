@@ -30,15 +30,6 @@ class DRAGON_EXPORT UniquePtr {
 	public:
 	UniquePtr(T* ptr) : ptr(ptr) {
 	}
-
-	/*
-	UniquePtr(UniquePtr<T> &p) {
-		T *tmp = p.ptr;
-		p.ptr = ptr;
-		ptr = tmp;
-	}
-*/
-	
 	
 	~UniquePtr();
 	
@@ -58,7 +49,6 @@ class DRAGON_EXPORT UniquePtr {
 		return ptr;
 	}
 	
-	
 	private:
 	T *ptr;
 };
@@ -71,8 +61,6 @@ class DRAGON_EXPORT UniquePtr {
 		ptr = nullptr;\
 	}
 
-	
-	
 }
 
 #endif

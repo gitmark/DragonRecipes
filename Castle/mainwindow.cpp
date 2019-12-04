@@ -13,6 +13,7 @@
 #include <DragonRecipes/Symbol.h>
 #include <DragonRecipes/Grammar.h>
 #include <DragonRecipes/Token.h>
+#include <DragonRecipes/Log.h>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -32,6 +33,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
+
+    log::info.setListener(newLogListener([&](const std::string &str){
+        ui->textEditLog->setText(ui->textEditLog->toPlainText() + str.c_str());
+    }));
+
+    log::info << "hey";
+    log::info.flush();
+
     std::vector<SymbolPtr> terminals;
 
     terminals.push_back(newTerm("a", 1));
@@ -51,6 +60,7 @@ void MainWindow::on_pushButton_clicked()
     grammar->add(newProduction("A", "a A"));
     grammar->add(newProduction("A", "b A"));
     grammar->add(newProduction("B", "c"));
+    grammar->add(newProduction("C", "B A"));
     grammar->setStartSymbol("A");
     grammar->updateMembers();
 

@@ -8,19 +8,12 @@
 
 #include <string>
 #include <memory>
-
 #include <DragonRecipes/Constants.h>
 
 namespace dragon
 {
 
-
 class SymbolPrivate;
-
-
-
-
-
 
     class DRAGON_EXPORT Symbol
     {
@@ -28,7 +21,7 @@ class SymbolPrivate;
         enum Type {unknown, term, nonterm};
 
         Symbol(const std::string &name = "", int id = 0, Type type = unknown);
-		Symbol::Symbol(UniquePtr<SymbolPrivate> &&ptr);
+        Symbol(UniquePtr<SymbolPrivate> &&ptr);
         virtual ~Symbol();
         
         int id() const;
@@ -50,8 +43,6 @@ class SymbolPrivate;
 
 
     typedef std::shared_ptr<Symbol> SymbolPtr;
-
-
 
     inline SymbolPtr newSymbol(const std::string &name = "", int id = 0, Symbol::Type type = Symbol::unknown) {
         return std::make_shared<Symbol>(name, id, type);

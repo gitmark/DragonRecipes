@@ -14,7 +14,7 @@ namespace dragon
     public:
         SymbolPrivate(const std::string &name = "", int id = 0, Symbol::Type type = Symbol::unknown) :
             name(name), id(id), type(type) {}
-        virtual ~SymbolPrivate() {}
+        virtual ~SymbolPrivate();
 
         std::string name;
         int id;

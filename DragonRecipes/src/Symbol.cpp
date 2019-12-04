@@ -10,6 +10,8 @@
 
 namespace dragon
     {
+    SymbolPrivate::~SymbolPrivate() {};
+
 	UNIQUE_PTR_IMPL(SymbolPrivate)
 	
     Symbol::Symbol(const std::string &name, int id, Type type) :

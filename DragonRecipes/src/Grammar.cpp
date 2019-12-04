@@ -14,14 +14,22 @@
 
 namespace dragon
     {
+    bool compareSymbol(const SymbolPtr &sp1, const SymbolPtr &sp2)
+    {
+        return (sp1->id() < sp2->id());
+    }
 
     class GrammarPrivate
     {
     public:
-        GrammarPrivate() {
-        }
+        GrammarPrivate() :
+            termFirstId(-1),
+            termLastId(-1),
+            nontermFirstId(-1),
+            nontermLastId(-1)
+        {}
 
-         int firstInBody(const std::string &body, std::set<std::string> &firstSet) {
+         int firstInBody(const std::string &body, std::set<std::string> &firstSet) const {
             std::vector<std::string> parts;
             split(body, " ", parts);
 
@@ -51,7 +59,7 @@ namespace dragon
             return 0;
         }
 
-        int first(const std::string &x, std::set<std::string> &firstSet) {
+        int first(const std::string &x, std::set<std::string> &firstSet) const {
 
             auto &m = productions;
             if (x.find(" ") != std::string::npos)
@@ -86,6 +94,11 @@ namespace dragon
         std::vector<SymbolPtr> terminals;
         std::vector<SymbolPtr> nonterminals;
         std::string startSymbol;
+        int termFirstId;
+        int termLastId;
+        int nontermFirstId;
+        int nontermLastId;
+        ErrorPtr lastError;
     };
 
 	UNIQUE_PTR_IMPL(GrammarPrivate)
@@ -110,12 +123,19 @@ namespace dragon
         }
     }
 
-
     void Grammar::print(std::ostream &os) const
     {
         // Print terminals
         os << "terminals:\n";
         for(auto &term : data->terminals) {
+            os << term->name() << ": " << term->id() << "\n";
+        }
+
+        os << "\n";
+
+        // Print nonterminals
+        os << "nonterminals:\n";
+        for(auto &term : data->nonterminals) {
             os << term->name() << ": " << term->id() << "\n";
         }
 
@@ -140,6 +160,23 @@ namespace dragon
             os << "\n";
             }
         }
+
+        os << "\n";
+
+        // Print FIRST sets
+
+        for(auto &nonterm : nontermVec()) {
+        os << "FIRST(" << nonterm << ") =";
+        std::set<std::string> first1;
+        first(nonterm, first1);
+
+        for(auto &symbol : first1) {
+            os << " ";
+            os << symbol;
+        }
+
+        os << "\n";
+        }
     }
 
     std::string Grammar::toString() const {
@@ -148,9 +185,8 @@ namespace dragon
         return ss.str();
     }
 
-    int Grammar::first(const std::string &x, std::set<std::string> &first) {
-
-        return 0;
+    int Grammar::first(const std::string &x, std::set<std::string> &first) const {
+        return data->first(x, first);
     }
 
     const std::vector<std::string> &Grammar::nontermVec() const {
@@ -161,12 +197,56 @@ namespace dragon
         return data->termVec;
     }
 
-    void Grammar::setTerminals(const std::vector<SymbolPtr> &terminals) {
+    int Grammar::setTerminals(const std::vector<SymbolPtr> &terminals) {
         data->terminals = terminals;
+        data->termSet.clear();
+        data->termVec.clear();
+
+        if(!terminals.size())
+            return E_SUCCESS;
+
+        std::sort(data->terminals.begin(), data->terminals.end(), compareSymbol);
+
+        if (data->termFirstId >= 0 && data->terminals.front()->id() < data->termFirstId) {
+            return E_TERM_OUT_OF_RANGE;
+        }
+
+        if (data->termFirstId >= 0 && data->terminals.back()->id() > data->termLastId) {
+            return E_TERM_OUT_OF_RANGE;
+        }
+
+        for (auto &symbol : data->terminals) {
+            data->termVec.push_back(symbol->name());
+            data->termSet.insert(symbol->name());
+        }
+
+        return E_SUCCESS;
     }
 
-    void Grammar::setNonterminals(const std::vector<SymbolPtr> &nonterminals) {
+    int Grammar::setNonterminals(const std::vector<SymbolPtr> &nonterminals) {
         data->nonterminals = nonterminals;
+        data->nontermSet.clear();
+        data->nontermVec.clear();
+
+        if(!nonterminals.size())
+            return E_SUCCESS;
+
+        std::sort(data->nonterminals.begin(), data->nonterminals.end(), compareSymbol);
+
+        if (data->nontermFirstId >= 0 && data->nonterminals.front()->id() < data->nontermFirstId) {
+            return E_NONTERM_OUT_OF_RANGE;
+        }
+
+        if (data->nontermFirstId >= 0 && data->nonterminals.back()->id() > data->nontermLastId) {
+            return E_NONTERM_OUT_OF_RANGE;
+        }
+
+        for (auto &symbol : data->nonterminals) {
+            data->nontermVec.push_back(symbol->name());
+            data->nontermSet.insert(symbol->name());
+        }
+
+        return E_SUCCESS;
     }
 
     void Grammar::setProductions(const std::map<std::string, std::vector<ProdPtr>> &productions) {
@@ -181,5 +261,22 @@ namespace dragon
 
     }
 
+    void Grammar::setTerminalRange(int firstId, int lastId) {
+        data->termFirstId = firstId;
+        data->termLastId = lastId;
+    }
+
+    void Grammar::setNonterminalRange(int firstId, int lastId) {
+        data->nontermFirstId = firstId;
+        data->nontermLastId = lastId;
+    }
+
+    ErrorPtr Grammar::lastError() {
+        return data->lastError;
+    }
+
+    void Grammar::clearLastError() {
+        data->lastError = nullptr;
+    }
 
     }

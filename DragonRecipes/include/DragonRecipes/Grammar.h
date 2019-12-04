@@ -15,6 +15,7 @@
 #include <DragonRecipes/Symbol.h>
 #include <DragonRecipes/Token.h>
 #include <DragonRecipes/Production.h>
+#include <DragonRecipes/Error.h>
 
 namespace dragon
 {
@@ -24,13 +25,14 @@ class GrammarPrivate;
     class DRAGON_EXPORT Grammar
     {
     public:
+        enum Error {None, TermOutOfRange, NontermOutOfRange, UnknownSymbol};
         Grammar();
         virtual ~Grammar();
 
         void add(std::shared_ptr<Production> production);
         void add(std::shared_ptr<Symbol> symbol);
 
-        int first(const std::string &x, std::set<std::string> &first);
+        int first(const std::string &x, std::set<std::string> &first) const;
         void print(std::ostream &os) const;
         std::string toString() const;
 
@@ -45,11 +47,16 @@ class GrammarPrivate;
         int tokenType(int id) const;
         int tokenType(const std::string &token) const;
 
-        void setTerminals(const std::vector<SymbolPtr> &terminals);
-        void setNonterminals(const std::vector<SymbolPtr> &nonterminals);
+        int setTerminals(const std::vector<SymbolPtr> &terminals);
+        int setNonterminals(const std::vector<SymbolPtr> &nonterminals);
         void setProductions(const std::map<std::string, std::vector<ProdPtr>> &productions);
         void setStartSymbol(const std::string& symbol);
         void updateMembers();
+        void setTerminalRange(int firstId, int lastId);
+        void setNonterminalRange(int firstId, int lastId);
+
+        ErrorPtr lastError();
+        void clearLastError();
 
     protected:
         UniquePtr<GrammarPrivate> data;
