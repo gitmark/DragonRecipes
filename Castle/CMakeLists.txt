@@ -112,8 +112,9 @@ endif()
 # ----------------------------------------------------------------------------
 # Install the app in the bin directory
 # ----------------------------------------------------------------------------
-install(TARGETS ${name}
-	RUNTIME DESTINATION bin)
+#install(TARGETS ${name}
+#	RUNTIME DESTINATION bin)
+
 
 
 INSTALL(CODE "execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/uninstall-castle.sh)" )
@@ -123,4 +124,11 @@ INSTALL(CODE "execute_process(COMMAND cp -a
 ${CMAKE_CURRENT_BINARY_DIR}/Castle.app
 /Applications/)" )
 
+INSTALL (
+	FILES ${CMAKE_CURRENT_SOURCE_DIR}/castle.sh
+	PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+	DESTINATION /Applications/Castle.app/Contents/MacOS/)
 
+INSTALL(CODE "execute_process(COMMAND ln -nsf
+/Applications/Castle.app/Contents/MacOS/castle.sh
+${CMAKE_INSTALL_PREFIX}/bin/castle )" )
