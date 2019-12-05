@@ -11,6 +11,13 @@
 # ----------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.0)
 
+execute_process(COMMAND ${CMAKE_SOURCE_DIR}/cxx-version.sh ${CMAKE_CXX_COMPILER}
+		OUTPUT_VARIABLE cxxver)
+string(STRIP ${cxxver} cxxver)
+
+#message("version string = ${cxxver}")
+
+
 # ----------------------------------------------------------------------------
 # Set the name of the project. The major version number is appended to the 
 # base name.
@@ -25,8 +32,8 @@ set(min_ver 0)
 set(patch_ver 0)
 set(full_ver ${maj_ver}.${min_ver}.${patch_ver})
 
-set(base_name dragonrecipes)
-set(name ${base_name}${maj_ver})
+set(base_name DragonRecipes)
+set(name dragonrecipes${maj_ver}.${min_ver}-${cxxver})
 project(${name})
 if(WIN32)
 set(ext lib)
@@ -128,29 +135,33 @@ install(TARGETS ${name}
    RUNTIME DESTINATION ${base_name}/${full_ver}/bin) # .dll file is installed here for Windows
 
 INSTALL (
-    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/${base_name}/${full_ver}/include
-    FILES_MATCHING PATTERN "*.h")
+	FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/DragonRecipes.h
+	DESTINATION ${CMAKE_INSTALL_PREFIX}/${base_name}/${full_ver}/include)
 
 INSTALL (
-    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/${base_name}
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/${base_name}/${full_ver}/include/${base_name}
-    FILES_MATCHING PATTERN "*.h")
+	DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/DragonRecipes
+	DESTINATION ${CMAKE_INSTALL_PREFIX}/${base_name}/${full_ver}/include
+	FILES_MATCHING PATTERN "*.h")
+
+#INSTALL (
+#    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/${base_name}
+#    DESTINATION ${CMAKE_INSTALL_PREFIX}/${base_name}/${full_ver}/include/${base_name}
+#    FILES_MATCHING PATTERN "*.h")
 
 INSTALL(CODE "execute_process(COMMAND ln -nsf 
-${CMAKE_INSTALL_PREFIX}/${base_name}/${maj_ver}/include/${base_name}
+${CMAKE_INSTALL_PREFIX}/${base_name}/${maj_ver}.${min_ver}/include/${base_name}
 ${CMAKE_INSTALL_PREFIX}/include/${base_name} )" )
 
 INSTALL(CODE "execute_process(COMMAND ln -nsf 
-${CMAKE_INSTALL_PREFIX}/${base_name}/${maj_ver}/include/DragonRecipes.h
+${CMAKE_INSTALL_PREFIX}/${base_name}/${maj_ver}.${min_ver}/include/DragonRecipes.h
 ${CMAKE_INSTALL_PREFIX}/include/DragonRecipes.h )" )
 
 INSTALL(CODE "execute_process(COMMAND ln -nsf 
 ${CMAKE_INSTALL_PREFIX}/${base_name}/${full_ver} 
-${CMAKE_INSTALL_PREFIX}/${base_name}/${maj_ver} )" )
+${CMAKE_INSTALL_PREFIX}/${base_name}/${maj_ver}.${min_ver} )" )
 
 INSTALL(CODE "execute_process(COMMAND ln -nsf
-${CMAKE_INSTALL_PREFIX}/${base_name}/${maj_ver}/lib/lib${name}.${ext} 
+${CMAKE_INSTALL_PREFIX}/${base_name}/${maj_ver}.${min_ver}/lib/lib${name}.${ext}
 ${CMAKE_INSTALL_PREFIX}/${base_name}/lib/lib${name}.${ext} )" )
 
 INSTALL(CODE "execute_process(COMMAND ln -nsf 

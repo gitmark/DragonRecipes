@@ -11,6 +11,10 @@
 # ----------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.0)
 
+execute_process(COMMAND ${CMAKE_SOURCE_DIR}/cxx-version.sh ${CMAKE_CXX_COMPILER}
+                OUTPUT_VARIABLE cxxver)
+string(STRIP ${cxxver} cxxver)
+
 # ----------------------------------------------------------------------------
 # Set the name of the project.
 # ----------------------------------------------------------------------------
@@ -71,9 +75,9 @@ add_executable(${name} ${SRC_FILES} ${HEADER_FILES})
 # Link the app with the library
 # ----------------------------------------------------------------------------
 if(WIN32)
-	target_link_libraries(${name} dragonrecipes0.lib)
+	target_link_libraries(${name} dragonrecipes0.0-${cxxver}.lib)
 else()
-	target_link_libraries(${name} dragonrecipes0)
+	target_link_libraries(${name} dragonrecipes0.0-${cxxver})
 endif()	
 
 # ----------------------------------------------------------------------------
