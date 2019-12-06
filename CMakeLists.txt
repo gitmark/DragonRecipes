@@ -23,6 +23,9 @@ message("CXX = ${CMAKE_CXX_COMPILER}")
 # ----------------------------------------------------------------------------
 set(CMAKE_MACOSX_RPATH OFF)
 
+execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/copy-version.sh
+WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
 execute_process(COMMAND ${CMAKE_SOURCE_DIR}/cxx-version.sh ${CMAKE_CXX_COMPILER}
                 OUTPUT_VARIABLE cxxver)
 string(STRIP ${cxxver} cxxver)
