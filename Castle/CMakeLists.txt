@@ -1,9 +1,16 @@
+#----------------------------------------------------------------------------
+#   CMakeLists.txt    Defines the build and install configurations for the
+#                     Dragon Recipes project
+#
+#   Copyright (c) 2019 Mark Elrod. All rights reserved. This file is
+#   distributed under the MIT License. See LICENSE.TXT for details.
+#----------------------------------------------------------------------------
+
 cmake_minimum_required(VERSION 3.1.0)
 
 execute_process(COMMAND ${CMAKE_SOURCE_DIR}/cxx-version.sh ${CMAKE_CXX_COMPILER}
                 OUTPUT_VARIABLE cxxver)
 string(STRIP ${cxxver} cxxver)
-
 
 set(name castle)
 project(${name})
@@ -12,7 +19,6 @@ project(${name})
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(MACOS TRUE)
 endif()
-
 
 if(WIN32)
 set(comp msvc2017)
@@ -28,7 +34,6 @@ endif()
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-message("${basedir}/Qt/5.12.6/${comp}_64/lib/cmake/Qt5")
 set(Qt5_DIR "${basedir}/Qt/5.12.6/${comp}_64/lib/cmake/Qt5")
 
 if(CMAKE_VERSION VERSION_LESS "3.7.0")
@@ -60,7 +65,7 @@ FILE (GLOB QRC_FILES *.qrc)
 # ----------------------------------------------------------------------------
 # Set the include and link search directories
 # ----------------------------------------------------------------------------
-include_directories(../DragonRecipes/include)
+include_directories(../DragonRecipes/include .)
 #include_directories(/usr/local/include)
 if (CMAKE_GENERATOR MATCHES "Unix Makefiles")
 link_directories(${CMAKE_BINARY_DIR}/DragonRecipes)
@@ -97,16 +102,18 @@ add_custom_command(TARGET ${name}
 POST_BUILD
 COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/make-bundle.sh
 ${CMAKE_CURRENT_SOURCE_DIR}
-${CMAKE_CURRENT_BINARY_DIR})
+${CMAKE_CURRENT_BINARY_DIR}
+${drver}-${cxxver}
+)
 endif()
 
 # ----------------------------------------------------------------------------
 # Link the app with the library
 # ----------------------------------------------------------------------------
 if(WIN32)
-	target_link_libraries(${name} dragonrecipes0..0-${cxxver}.lib)
+	target_link_libraries(${name} dragonrecipes${drver}-${cxxver}.lib)
 else()
-	target_link_libraries(${name} dragonrecipes0.0-${cxxver})
+	target_link_libraries(${name} dragonrecipes${drver}-${cxxver})
 endif()
 
 # ----------------------------------------------------------------------------
@@ -115,10 +122,7 @@ endif()
 #install(TARGETS ${name}
 #	RUNTIME DESTINATION bin)
 
-
-
 INSTALL(CODE "execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/uninstall-castle.sh)" )
-
 
 INSTALL(CODE "execute_process(COMMAND cp -a
 ${CMAKE_CURRENT_BINARY_DIR}/Castle.app

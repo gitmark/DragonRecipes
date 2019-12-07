@@ -14,6 +14,13 @@ if [ "$dest" == "" ]; then
 	exit 1
 fi
 
+ver=$3
+
+if [ "$ver" == "" ]; then
+    echo "must provide a version"
+    exit 1
+fi
+
 cd $src
 srcBundle=$src/bundle
 destBundle=$dest/Castle.app
@@ -24,7 +31,7 @@ cp -a $srcBundle $destBundle
 
 cd $src/icon
 ./compile-icon.sh $dest $destBundle
-cp $dest/../DragonRecipes/libdragonrecipes0.dylib $destBundle/Contents/Resources/
+cp $dest/../DragonRecipes/libdragonrecipes* $destBundle/Contents/Resources/
 
 cd $src
 
@@ -33,6 +40,7 @@ cd $src
 d=`echo $dest | sed $'s/\\/castle//'`
 echo "dest = $dest"
 echo "d = $d"
+echo "ver = $ver"
 
-./change-rpath.sh $d $destBundle
+./change-rpath.sh $d $destBundle $ver
 

@@ -31,5 +31,3 @@ cp -R $qtplugins/platforms/libqcocoa* $bundle/Contents/plugins/platforms/
 cp -R $qtplugins/imageformats $bundle/Contents/plugins/
 cp -R $qtplugins/styles $bundle/Contents/plugins/
 
-
-

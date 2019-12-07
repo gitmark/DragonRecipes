@@ -15,9 +15,6 @@ execute_process(COMMAND ${CMAKE_SOURCE_DIR}/cxx-version.sh ${CMAKE_CXX_COMPILER}
 		OUTPUT_VARIABLE cxxver)
 string(STRIP ${cxxver} cxxver)
 
-#message("version string = ${cxxver}")
-
-
 # ----------------------------------------------------------------------------
 # Set the name of the project. The major version number is appended to the 
 # base name.
@@ -33,7 +30,7 @@ set(patch_ver 0)
 set(full_ver ${maj_ver}.${min_ver}.${patch_ver})
 
 set(base_name DragonRecipes)
-set(name dragonrecipes${maj_ver}.${min_ver}-${cxxver})
+set(name dragonrecipes${drver}-${cxxver})
 project(${name})
 if(WIN32)
 set(ext lib)

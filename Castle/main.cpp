@@ -8,15 +8,13 @@
 #include <QDir>
 #include <QCoreApplication>
 
+#include <iostream>
+#include <getopt.h>
+#include <DragonRecipes.h>
+#include <App.h>
+
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    QDir dir(QCoreApplication::applicationDirPath());
-    dir.cdUp();
-    dir.cd("plugins");
-    QCoreApplication::setLibraryPaths(QStringList(dir.absolutePath()));
-    a.setWindowIcon(QIcon(":/images/castle.icns"));
-    MainWindow w;
-    w.show();
-    return a.exec();
+    auto app = App::create();
+    return app->run(argc, argv);
 }

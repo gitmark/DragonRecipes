@@ -16,7 +16,6 @@ cmake_minimum_required(VERSION 3.0)
 # ----------------------------------------------------------------------------
 set(name "DragonProject")
 project(${name})
-message("CXX = ${CMAKE_CXX_COMPILER}")
 
 # ----------------------------------------------------------------------------
 # Turn off RPATH for the library install name on macOS.
@@ -30,13 +29,16 @@ execute_process(COMMAND ${CMAKE_SOURCE_DIR}/cxx-version.sh ${CMAKE_CXX_COMPILER}
                 OUTPUT_VARIABLE cxxver)
 string(STRIP ${cxxver} cxxver)
 
+execute_process(COMMAND ${CMAKE_SOURCE_DIR}/dr-version.sh
+	            OUTPUT_VARIABLE drver
+				WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+				)
+
+string(STRIP ${drver} drver)
+
 add_subdirectory(DragonRecipes)
 add_subdirectory(Knight)
 add_subdirectory(Castle)
 
-add_dependencies(knight dragonrecipes0.0-${cxxver})
-add_dependencies(castle dragonrecipes0.0-${cxxver})
-
-
-
-
+add_dependencies(knight dragonrecipes${drver}-${cxxver})
+add_dependencies(castle dragonrecipes${drver}-${cxxver})

@@ -3,10 +3,16 @@
    distributed under the MIT License. See LICENSE.TXT for details.
   --------------------------------------------------------------------------*/
 
-#ifndef KNIGHT_VERSION_H
-#define KNIGHT_VERSION_H
+#include <string>
+#include <PrivateHeaders/Version.h>
+#include <DragonRecipes/Version.h>
 
-#define KNIGHT_VERSION "0.0.0"
-#define KNIGHT_DEV_STAGE "alpha"
+#include <iostream>
 
-#endif
+namespace dragon {
+
+std::string dragonRecipesVersion() {
+    return std::string(DRAGON_RECIPES_VERSION) + " " + DRAGON_RECIPES_DEV_STAGE;
+}
+
+}

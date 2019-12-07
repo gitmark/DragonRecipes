@@ -58,10 +58,8 @@ FILE (GLOB HEADER_FILES include/*.h)
 # Set the include and link search directories
 # ----------------------------------------------------------------------------
 include_directories(../DragonRecipes/include)
-#include_directories(/usr/local/include)
 if (CMAKE_GENERATOR MATCHES "Unix Makefiles")
 link_directories(${CMAKE_BINARY_DIR}/DragonRecipes)
-#link_directories(/usr/local/lib)
 else()
 link_directories(${CMAKE_BINARY_DIR}/DragonRecipes)
 endif()
@@ -75,9 +73,9 @@ add_executable(${name} ${SRC_FILES} ${HEADER_FILES})
 # Link the app with the library
 # ----------------------------------------------------------------------------
 if(WIN32)
-	target_link_libraries(${name} dragonrecipes0.0-${cxxver}.lib)
+	target_link_libraries(${name} dragonrecipes${drver}-${cxxver}.lib)
 else()
-	target_link_libraries(${name} dragonrecipes0.0-${cxxver})
+	target_link_libraries(${name} dragonrecipes${drver}-${cxxver})
 endif()	
 
 # ----------------------------------------------------------------------------

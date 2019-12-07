@@ -18,6 +18,16 @@ fi
 
 echo "bundle = $bundle"
 
+ver=$3
+
+if [ "$ver" == "" ]; then
+    echo "must provide a version"
+    exit 1
+fi
+
+echo "bundle = $ver"
+
+
 qtwidgets=Frameworks/QtWidgets.framework/Versions/5/QtWidgets
 install_name_tool -id @executable_path/../$qtwidgets $bundle/Contents/$qtwidgets
 
@@ -55,9 +65,9 @@ install_name_tool -change @rpath/QtWidgets.framework/Versions/5/QtWidgets @execu
 install_name_tool -change @rpath/QtCore.framework/Versions/5/QtCore @executable_path/../$qtcore $bundle/Contents/$qtdbus
 
 #echo "final dir = "
-install_name_tool -change $buildDir/dragonrecipes/libdragonrecipes0.dylib @executable_path/../Resources/libdragonrecipes0.dylib $bundle/Contents/MacOS/castle
+install_name_tool -change $buildDir/dragonrecipes/libdragonrecipes$ver.dylib @executable_path/../Resources/libdragonrecipes$ver.dylib $bundle/Contents/MacOS/castle
 
-install_name_tool -id @executable_path/../Resources/libdragonrecipes0.dylib $bundle/Contents/Resources/libdragonrecipes0.dylib
+install_name_tool -id @executable_path/../Resources/libdragonrecipes$ver.dylib $bundle/Contents/Resources/libdragonrecipes$ver.dylib
 
 cocoa=$bundle/Contents/plugins/platforms/libqcocoa.dylib
 install_name_tool -change @rpath/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../$qtwidgets $cocoa

@@ -3,10 +3,10 @@
    distributed under the MIT License. See LICENSE.TXT for details.
   --------------------------------------------------------------------------*/
 
-#ifndef KNIGHT_VERSION_H
-#define KNIGHT_VERSION_H
+#ifndef DRAGON_RECIPES_VERSION_H
+#define DRAGON_RECIPES_VERSION_H
 
-#define KNIGHT_VERSION "0.0.0"
-#define KNIGHT_DEV_STAGE "alpha"
+#define DRAGON_RECIPES_VERSION "0.0.0"
+#define DRAGON_RECIPES_DEV_STAGE "alpha"
 
 #endif

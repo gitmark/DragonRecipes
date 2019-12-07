@@ -4,16 +4,16 @@
 --------------------------------------------------------------------------*/
 
 #include <iostream>
+#include <getopt.h>
 #include <DragonRecipes.h>
+#include <App.h>
 
 using namespace dragon;
 
-int main(int argc, const char *argv[]) {
-    Production p("a", "b");
-    p.print(std::cout);
-    std::cout << "\n";
-	std::cout << "hello\n";
-	return 0;
+int main(int argc, char *argv[])
+{
+    auto app = App::create();
+    return app->run(argc, argv);
 }
 
 

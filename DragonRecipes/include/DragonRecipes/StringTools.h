@@ -9,7 +9,6 @@
 #include <string>
 #include <vector>
 #include <sstream>
-
 #include <DragonRecipes/Constants.h>
 
 namespace dragon {

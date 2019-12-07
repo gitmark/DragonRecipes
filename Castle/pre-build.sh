@@ -18,6 +18,10 @@ cd $src
 srcBundle=$src/bundle
 destBundle=$dest/Castle.app
 
+if [ -e $destBundle ]; then
+    rm -rf $destBundle
+fi
+
 echo "src = $src"
 echo "dest = $dest"
 cp -a $srcBundle $destBundle
