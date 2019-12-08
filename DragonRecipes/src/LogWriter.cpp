@@ -8,8 +8,7 @@
 #include <DragonRecipes/StringTools.h>
 #include <DragonRecipes/Log.h>
 
-namespace dragon
-    {
+namespace dragon {
 
 std::vector<LogWriterPtr> initLogs() {
     std::vector<LogWriterPtr> Logs;
@@ -22,9 +21,8 @@ std::vector<LogWriterPtr> &LogWriters() {
     return _LogWriters;
 }
 
-class LogListenerPrivate
-{
-public:
+class LogListenerPrivate {
+  public:
     LogListenerPrivate(std::function<void(const std::string&)> lambda) : lambda(lambda) {}
     virtual ~LogListenerPrivate();
 
@@ -34,7 +32,7 @@ public:
 LogListenerPrivate::~LogListenerPrivate() {}
 
 LogListener::LogListener(std::function<void(const std::string&)> lambda) : data(new LogListenerPrivate(lambda)) {
- }
+}
 
 LogListener::~LogListener() {
 }
@@ -43,36 +41,35 @@ void LogListener::write(const std::string &msg) {
     data->lambda(msg);
 }
 
-    class LogWriterPrivate
-    {
-    public:
-        LogWriterPrivate() {}
-        virtual ~LogWriterPrivate();
+class LogWriterPrivate {
+  public:
+    LogWriterPrivate() {}
+    virtual ~LogWriterPrivate();
 
-        std::vector<LogListenerPtr> Listeners;
-    };
+    std::vector<LogListenerPtr> Listeners;
+};
 
-    LogWriterPrivate::~LogWriterPrivate() {}
+LogWriterPrivate::~LogWriterPrivate() {}
 
 
-    LogWriter::LogWriter() : data(new LogWriterPrivate()) {}
-    
-    LogWriter::~LogWriter() {
-    }
+LogWriter::LogWriter() : data(new LogWriterPrivate()) {}
 
-    void LogWriter::addListener(LogListenerPtr listener) {
-        data->Listeners.push_back(listener);
-    }
+LogWriter::~LogWriter() {
+}
 
-    void LogWriter::setListener(LogListenerPtr listener) {
-        data->Listeners.clear();
-        data->Listeners.push_back(listener);
-    }
+void LogWriter::addListener(LogListenerPtr listener) {
+    data->Listeners.push_back(listener);
+}
 
-    void LogWriter::write(const char *buf, int count) {
-        std::string msg(buf, static_cast<size_t>(count));
-        for (auto Listener : data->Listeners)
-            Listener->write(msg);
-    }
+void LogWriter::setListener(LogListenerPtr listener) {
+    data->Listeners.clear();
+    data->Listeners.push_back(listener);
+}
 
-    }
+void LogWriter::write(const char *buf, int count) {
+    std::string msg(buf, static_cast<size_t>(count));
+    for (auto Listener : data->Listeners)
+        Listener->write(msg);
+}
+
+}

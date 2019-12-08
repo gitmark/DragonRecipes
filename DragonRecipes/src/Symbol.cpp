@@ -8,60 +8,57 @@
 #include <PrivateHeaders/SymbolPrivate.h>
 #include <DragonRecipes/StringTools.h>
 
-namespace dragon
-    {
-    SymbolPrivate::~SymbolPrivate() {};
+namespace dragon {
+SymbolPrivate::~SymbolPrivate() {};
 
-	UNIQUE_PTR_IMPL(SymbolPrivate)
-	
-    Symbol::Symbol(const std::string &name, int id, Type type) :
-        data(new SymbolPrivate(name, id, type)) {}
+UNIQUE_PTR_IMPL(SymbolPrivate)
 
-    Symbol::Symbol(UniquePtr<SymbolPrivate> &&ptr) :
-        data(std::move(ptr)) {}
+Symbol::Symbol(const std::string &name, int id, Type type) :
+    data(new SymbolPrivate(name, id, type)) {}
 
-    Symbol::~Symbol() {
-    }
-      
-    void Symbol::print(std::ostream &os) const
-    {
-        os << "class: Symbol\n";
-        os << "name: " << data->name << "\n";
-        os << "id: " << data->id << "\n";
-        os << "type: " << typeStr() << "\n";
-    }
-    
-    std::string Symbol::toString() const {
-        std::stringstream ss;
-        print(ss);
-        return ss.str();
-    }
-    
-    int Symbol::id() const {
-        return data->id;
-    }
-    const std::string Symbol::name() const {
-        return data->name;
-    }
+Symbol::Symbol(UniquePtr<SymbolPrivate> &&ptr) :
+    data(std::move(ptr)) {}
 
-    Symbol::Type Symbol::type() const {
-        return data->type;
-    }
+Symbol::~Symbol() {
+}
 
-    std::string Symbol::typeStr() const {
-        return SymbolPrivate::typeStrings[data->type];
-    }
+void Symbol::print(std::ostream &os) const {
+    os << "class: Symbol\n";
+    os << "name: " << data->name << "\n";
+    os << "id: " << data->id << "\n";
+    os << "type: " << typeStr() << "\n";
+}
 
-    void Symbol::setId(int id) {
-        data->id = id;
-    }
-    void Symbol::setName(const std::string &name) {
-        data->name = name;
-    }
+std::string Symbol::toString() const {
+    std::stringstream ss;
+    print(ss);
+    return ss.str();
+}
 
-    void Symbol::setType(Symbol::Type type) {
-        data->type = type;
-    }
+int Symbol::id() const {
+    return data->id;
+}
+const std::string Symbol::name() const {
+    return data->name;
+}
 
+Symbol::Type Symbol::type() const {
+    return data->type;
+}
 
-    }
+std::string Symbol::typeStr() const {
+    return SymbolPrivate::typeStrings[data->type];
+}
+
+void Symbol::setId(int id) {
+    data->id = id;
+}
+void Symbol::setName(const std::string &name) {
+    data->name = name;
+}
+
+void Symbol::setType(Symbol::Type type) {
+    data->type = type;
+}
+
+}

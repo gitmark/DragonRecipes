@@ -17,59 +17,55 @@
 #include <DragonRecipes/Production.h>
 #include <DragonRecipes/Error.h>
 
-namespace dragon
-{
+namespace dragon {
 
 class GrammarPrivate;
 
-    class DRAGON_EXPORT Grammar
-    {
-    public:
-        enum Error {None, TermOutOfRange, NontermOutOfRange, UnknownSymbol};
-        Grammar();
-        virtual ~Grammar();
+class DRAGON_EXPORT Grammar {
+  public:
+    enum Error {None, TermOutOfRange, NontermOutOfRange, UnknownSymbol};
+    Grammar();
+    virtual ~Grammar();
 
-        void add(std::shared_ptr<Production> production);
-        void add(std::shared_ptr<Symbol> symbol);
+    void add(std::shared_ptr<Production> production);
+    void add(std::shared_ptr<Symbol> symbol);
 
-        int first(const std::string &x, std::set<std::string> &first) const;
-        void print(std::ostream &os) const;
-        std::string toString() const;
+    int first(const std::string &x, std::set<std::string> &first) const;
+    void print(std::ostream &os) const;
+    std::string toString() const;
 
-        const std::vector<std::string> &nontermVec() const;
-        const std::vector<std::string> &termVec() const;
-        const std::set<std::string> &nontermSet() const;
-        const std::set<std::string> &termSet() const;
+    const std::vector<std::string> &nontermVec() const;
+    const std::vector<std::string> &termVec() const;
+    const std::set<std::string> &nontermSet() const;
+    const std::set<std::string> &termSet() const;
 
-        int tokenId(const std::string &token) const;
-        std::string tokenString(int id) const;
+    int tokenId(const std::string &token) const;
+    std::string tokenString(int id) const;
 
-        int tokenType(int id) const;
-        int tokenType(const std::string &token) const;
+    int tokenType(int id) const;
+    int tokenType(const std::string &token) const;
 
-        int setTerminals(const std::vector<SymbolPtr> &terminals);
-        int setNonterminals(const std::vector<SymbolPtr> &nonterminals);
-        void setProductions(const std::map<std::string, std::vector<ProdPtr>> &productions);
-        void setStartSymbol(const std::string& symbol);
-        void updateMembers();
-        void setTerminalRange(int firstId, int lastId);
-        void setNonterminalRange(int firstId, int lastId);
+    int setTerminals(const std::vector<SymbolPtr> &terminals);
+    int setNonterminals(const std::vector<SymbolPtr> &nonterminals);
+    void setProductions(const std::map<std::string, std::vector<ProdPtr>> &productions);
+    void setStartSymbol(const std::string& symbol);
+    void updateMembers();
+    void setTerminalRange(int firstId, int lastId);
+    void setNonterminalRange(int firstId, int lastId);
 
-        ErrorPtr lastError();
-        void clearLastError();
+    ErrorPtr lastError();
+    void clearLastError();
 
-    protected:
-        UniquePtr<GrammarPrivate> data;
-    };
+  protected:
+    UniquePtr<GrammarPrivate> data;
+};
 
-    typedef std::shared_ptr<Grammar> GrammarPtr;
+typedef std::shared_ptr<Grammar> GrammarPtr;
 
-    inline GrammarPtr newGrammar() {
-        return std::make_shared<Grammar>();
-    }
-	
+inline GrammarPtr newGrammar() {
+    return std::make_shared<Grammar>();
+}
 
-			
 }
 
 #endif

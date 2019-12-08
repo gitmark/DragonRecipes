@@ -23,9 +23,7 @@
 #include <DragonRecipes/Version.h>
 #include <Version.h>
 
-
-namespace dragon
-{
+namespace dragon {
 
 std::weak_ptr<App> App::_theApp;
 
@@ -35,32 +33,29 @@ App::App() :
     _versionNum(KNIGHT_VERSION),
     _devStage(KNIGHT_DEV_STAGE),
     _error(0)
-
 {}
 
-
-int App::parseArgs(int argc, char * argv[])
-{
-	std::string optLong;
-	std::string optArg;
+int App::parseArgs(int argc, char * argv[]) {
+    std::string optLong;
+    std::string optArg;
     char charBuf[2] = {0};
 
-	static struct option long_options[] = {
+    static struct option long_options[] = {
         { "version",	no_argument,			nullptr,			'v' },
         { "help",		no_argument,			nullptr,			'h' },
         { nullptr, 0, nullptr, 0 }
-	};
+    };
 
     int option_index = 0;
 
     while (true) {
         int opt = getopt_long(argc, argv, "+:vh",
-							long_options, &option_index);
+                              long_options, &option_index);
 
         if (opt == -1)
-			break;
+            break;
 
-		switch (opt) {
+        switch (opt) {
 
         case 0:
             printf("option %s", long_options[option_index].name);
@@ -69,37 +64,37 @@ int App::parseArgs(int argc, char * argv[])
             printf("\n");
             break;
 
-		case 'v':
-			_version = true;
-			break;
+        case 'v':
+            _version = true;
+            break;
 
-		case 'h':
-			_help = true;
-			break;
+        case 'h':
+            _help = true;
+            break;
 
-		case '?': {
+        case '?': {
             charBuf[0] = static_cast<char>(optopt);
             std::cerr << "error: bad option: " << charBuf << "\n";
             std::cerr << _usage << "\n";
             _error = 1;
-		}
+        }
         return 0;
 
-		case ':': {
+        case ':': {
             charBuf[0] = static_cast<char>(optopt);
             std::cerr << "error: mission argument for option: " << charBuf << "\n";
             std::cerr << _usage << "\n";
             _error = 1;
-		}
+        }
         return 0;
 
-		default:
-			std::cerr << "error: invalid argument\n";
-			std::cerr << _usage;
+        default:
+            std::cerr << "error: invalid argument\n";
+            std::cerr << _usage;
             _error = 1;
             return 1;
-		}
-	}
+        }
+    }
 
     int rc = 0;
 
@@ -110,11 +105,10 @@ int App::parseArgs(int argc, char * argv[])
         std::cout << "dragonrecipes version " << dragonRecipesVersion() << "\n";
     }
 
-	return rc;
+    return rc;
 }
 
-std::shared_ptr<App> App::create()
-{
+std::shared_ptr<App> App::create() {
     std::shared_ptr<App> ptr = App::_theApp.lock();
     if (ptr != nullptr)
         return nullptr;
@@ -124,8 +118,7 @@ std::shared_ptr<App> App::create()
     return app;
 }
 
-int App::run(int argc, char *argv[])
-{
+int App::run(int argc, char *argv[]) {
 
     std::stringstream ss;
 

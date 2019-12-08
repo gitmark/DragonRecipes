@@ -4,5 +4,6 @@ build-*/
 *.user
 html/
 latex/
+*.orig
 
 

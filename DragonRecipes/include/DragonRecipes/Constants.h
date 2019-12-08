@@ -7,50 +7,50 @@
 #define DR_CONSTANTS_H
 
 #ifdef DRAGON_RECIPES_LIB_BUILD
-    #ifdef _WIN32
-        #define DRAGON_EXPORT __declspec(dllexport)
-        #define DRAGON_LOCAL
-    #else
-        #define DRAGON_EXPORT __attribute__((visibility("default")))
-        #define DRAGON_LOCAL __attribute__((visibility("hidden")))
-    #endif
+#ifdef _WIN32
+#define DRAGON_EXPORT __declspec(dllexport)
+#define DRAGON_LOCAL
 #else
-    #ifdef _WIN32
-        #define DRAGON_EXPORT __declspec(dllimport)
-        #define DRAGON_LOCAL
-    #else
-        #define DRAGON_EXPORT
-        #define DRAGON_LOCAL
-    #endif
+#define DRAGON_EXPORT __attribute__((visibility("default")))
+#define DRAGON_LOCAL __attribute__((visibility("hidden")))
+#endif
+#else
+#ifdef _WIN32
+#define DRAGON_EXPORT __declspec(dllimport)
+#define DRAGON_LOCAL
+#else
+#define DRAGON_EXPORT
+#define DRAGON_LOCAL
+#endif
 #endif
 
 namespace dragon {
-	template <class T>
+template <class T>
 class DRAGON_EXPORT UniquePtr {
-	public:
-	UniquePtr(T* ptr) : ptr(ptr) {
-	}
-	
-	~UniquePtr();
-	
-	T *&get() {
-		return ptr;
-	}
+  public:
+    UniquePtr(T* ptr) : ptr(ptr) {
+    }
 
-	T * const&get() const {
-		return ptr;
-	}
-	
-		T *operator->() {
-		return ptr;
-	}
+    ~UniquePtr();
 
-	T * const operator->() const {
-		return ptr;
-	}
-	
-	private:
-	T *ptr;
+    T *&get() {
+        return ptr;
+    }
+
+    T * const&get() const {
+        return ptr;
+    }
+
+    T *operator->() {
+        return ptr;
+    }
+
+    T * const operator->() const {
+        return ptr;
+    }
+
+  private:
+    T *ptr;
 };
 
 

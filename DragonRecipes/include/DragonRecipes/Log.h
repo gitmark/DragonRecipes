@@ -14,16 +14,14 @@
 // http://www.mr-edd.co.uk/blog/beginners_guide_streambuf
 // http://stackoverflow.com/questions/21420526/implementing-stdbasic-streambuf-subclass-for-manipulating-input
 
-namespace dragon
-{
+namespace dragon {
 
 // B = std::iostream
 // T = LogBuf
 // A = ctor input param
 template<class B, class T, class A>
-class LogStream_ : public B
-{
-public:
+class LogStream_ : public B {
+  public:
     explicit LogStream_(A *logWriter = nullptr);
     explicit LogStream_(std::unique_ptr<A> &logWriter);
     void addListener(LogListenerPtr listener) {
@@ -33,10 +31,10 @@ public:
         logWriter->setListener(listener);
     }
     int error();
-	void clearError();
+    void clearError();
 
-private:
-	T sb;
+  private:
+    T sb;
     A *logWriter;
 };
 
@@ -51,15 +49,13 @@ LogStream_<B,T,A>::LogStream_(std::unique_ptr<A> &logWriter)
 {}
 
 template<class B, class T, class A>
-int LogStream_<B,T,A>::error()
-{
-	return sb.error();
+int LogStream_<B,T,A>::error() {
+    return sb.error();
 }
 
 template<class B, class T, class A>
-void LogStream_<B,T,A>::clearError()
-{
-	return sb.clearError();
+void LogStream_<B,T,A>::clearError() {
+    return sb.clearError();
 }
 
 typedef LogStream_<std::iostream, LogBuf<LogWriter, LogWriter,
@@ -74,6 +70,7 @@ DRAGON_EXPORT extern LogWriter warnLogWriter;
 DRAGON_EXPORT extern LogStream warn;
 DRAGON_EXPORT extern LogWriter errorLogWriter;
 DRAGON_EXPORT extern LogStream error;
+
 }
 
 }
