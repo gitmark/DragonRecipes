@@ -39,9 +39,7 @@ App::App() :
     _versionNum(CASTLE_VERSION),
     _devStage(CASTLE_DEV_STAGE),
     _error(0)
-
 {}
-
 
 int App::parseArgs(int argc, char * argv[])
 {
@@ -50,7 +48,8 @@ int App::parseArgs(int argc, char * argv[])
     char charBuf[2] = {0};
 
 	static struct option long_options[] = {
-        { "version",	no_argument,			nullptr,			'v' },
+    { "config",	required_argument,			nullptr,			'c' },
+    { "version",	no_argument,			nullptr,			'v' },
         { "help",		no_argument,			nullptr,			'h' },
         { nullptr, 0, nullptr, 0 }
 	};
@@ -58,7 +57,7 @@ int App::parseArgs(int argc, char * argv[])
     int option_index = 0;
 
     while (true) {
-        int opt = getopt_long(argc, argv, "+:vh",
+        int opt = getopt_long(argc, argv, "+:vhc:",
 							long_options, &option_index);
 
         if (opt == -1)
@@ -71,6 +70,11 @@ int App::parseArgs(int argc, char * argv[])
             if (optarg)
                 printf(" with arg %s", optarg);
             printf("\n");
+            break;
+
+        case 'c':
+            optLong = long_options[option_index].name;
+            _filename = optarg;
             break;
 
 		case 'v':
@@ -107,12 +111,11 @@ int App::parseArgs(int argc, char * argv[])
 
     int rc = 0;
 
-    if(_help) {
+    if (_help) {
         std::cout << _usage;
     } else if (_version) {
         std::cout << "castle version " << _versionNum << " " << _devStage << "\n";
         std::cout << "dragonrecipes version " << dragonRecipesVersion() << "\n";
-
     }
 
 	return rc;
@@ -150,6 +153,7 @@ int App::run(int argc, char *argv[])
     if (_help || _version)
         return 0;
 
+
     QApplication a(argc, argv);
     QDir dir(QCoreApplication::applicationDirPath());
     dir.cdUp();
@@ -157,6 +161,7 @@ int App::run(int argc, char *argv[])
     QCoreApplication::setLibraryPaths(QStringList(dir.absolutePath()));
     a.setWindowIcon(QIcon(":/images/castle.icns"));
     MainWindow w;
+    w.init(_filename);
     w.show();
     return a.exec();
 }

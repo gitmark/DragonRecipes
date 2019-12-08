@@ -7,6 +7,8 @@
 #include <string>
 #include <sstream>
 #include <memory>
+#include <fstream>
+#include <iostream>
 #include <QMessageBox>
 #include <QDir>
 #include <QApplication>
@@ -31,6 +33,10 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+int MainWindow::init(const std::string &filename) {
+    _filename = filename;
+}
+
 void MainWindow::on_pushButton_clicked()
 {
 
@@ -38,7 +44,14 @@ void MainWindow::on_pushButton_clicked()
         ui->textEditLog->setText(ui->textEditLog->toPlainText() + str.c_str());
     }));
 
-    log::info << "hey";
+std::string text;
+    if (_filename.size()) {
+    std::ifstream t(_filename);
+    std::stringstream buffer;
+    buffer << t.rdbuf();
+    text = buffer.str();
+    }
+    log::info << text;
     log::info.flush();
 
     std::vector<SymbolPtr> terminals;

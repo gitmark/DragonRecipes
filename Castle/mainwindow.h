@@ -23,9 +23,11 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    int init(const std::string &filename);
 
 protected:
     std::shared_ptr<Production> production;
+    std::string _filename;
 
 private slots:
     void on_pushButton_clicked();

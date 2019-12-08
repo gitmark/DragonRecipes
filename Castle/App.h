@@ -33,7 +33,8 @@ protected:
 	std::string _versionNum;
     std::string _devStage;
     std::string _usage;
-	int _error;
+    std::string _filename;
+    int _error;
 
 	static std::weak_ptr<App> _theApp;
 };
