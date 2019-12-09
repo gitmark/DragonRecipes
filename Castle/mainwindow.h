@@ -18,15 +18,22 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
+namespace castle {
+
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
   public:
     MainWindow(QWidget *parent = nullptr);
+    MainWindow(const MainWindow &mainWindow) = delete;
+    MainWindow(MainWindow &&mainWindow) noexcept = delete;
+    MainWindow &operator=(const MainWindow &mainWindow) = delete;
+    MainWindow &operator=(MainWindow &&mainWindow) noexcept = delete;
+
     ~MainWindow() override;
     int init(const std::string &filename);
 
-  protected:
+  private:
     std::shared_ptr<Production> production;
     std::string _filename;
 
@@ -36,6 +43,8 @@ class MainWindow : public QMainWindow {
   private:
     Ui::MainWindow *ui;
 };
+
+}
 
 #endif
 

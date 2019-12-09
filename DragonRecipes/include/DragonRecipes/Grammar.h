@@ -23,12 +23,18 @@ class GrammarPrivate;
 
 class DRAGON_EXPORT Grammar {
   public:
-    enum Error {None, TermOutOfRange, NontermOutOfRange, UnknownSymbol};
+    enum Error {None, TermOutOfRange, NontermOutOfRange, UnknownGrammar};
     Grammar();
+    Grammar(std::unique_ptr<GrammarPrivate> &&ptr);
+    Grammar(const Grammar &grammar);
+    Grammar(Grammar &&grammar) noexcept;
+    Grammar &operator=(const Grammar &grammar);
+    Grammar &operator=(Grammar &&Grammar) noexcept;
+
     virtual ~Grammar();
 
-    void add(std::shared_ptr<Production> production);
-    void add(std::shared_ptr<Symbol> symbol);
+    void add(const std::shared_ptr<Production> &production);
+    void add(const std::shared_ptr<Symbol> &symbol);
 
     int first(const std::string &x, std::set<std::string> &first) const;
     void print(std::ostream &os) const;
@@ -56,11 +62,11 @@ class DRAGON_EXPORT Grammar {
     ErrorPtr lastError();
     void clearLastError();
 
-  protected:
-    UniquePtr<GrammarPrivate> data;
+  private:
+      std::unique_ptr<GrammarPrivate> data;
 };
 
-typedef std::shared_ptr<Grammar> GrammarPtr;
+using GrammarPtr = std::shared_ptr<Grammar>;
 
 inline GrammarPtr newGrammar() {
     return std::make_shared<Grammar>();

@@ -9,7 +9,7 @@
 
 namespace dragon {
 
-int test(std::ostream &os) {
+int test(std::ostream &) {
 
     ProdPtr prod = newProduction("a", "b c");
     std::vector<TokenPtr> terminals;

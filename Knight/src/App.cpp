@@ -3,8 +3,8 @@
    distributed under the MIT License. See LICENSE.TXT for details.
   --------------------------------------------------------------------------*/
 
-#include <errno.h>
-#include <string.h>
+#include <cerrno>
+#include <cstring>
 #include <getopt.h>
 #include <iostream>
 #include <fstream>
@@ -23,24 +23,23 @@
 #include <DragonRecipes/Version.h>
 #include <Version.h>
 
-namespace dragon {
+using namespace dragon;
+
+namespace knight {
 
 std::weak_ptr<App> App::_theApp;
 
 App::App() :
-    _argc(0), _argv(nullptr),
-    _version(false), _help(false),
-    _versionNum(KNIGHT_VERSION),
-    _devStage(KNIGHT_DEV_STAGE),
-    _error(0)
+    _versionNum(appVersion()),
+    _devStage(appDevStage())
 {}
 
-int App::parseArgs(int argc, char * argv[]) {
+int App::parseArgs(int argc, char **argv) {
     std::string optLong;
     std::string optArg;
-    char charBuf[2] = {0};
+    std::vector<char> charBuf(2);
 
-    static struct option long_options[] = {
+    static std::vector<struct option> long_options = {
         { "version",	no_argument,			nullptr,			'v' },
         { "help",		no_argument,			nullptr,			'h' },
         { nullptr, 0, nullptr, 0 }
@@ -50,7 +49,7 @@ int App::parseArgs(int argc, char * argv[]) {
 
     while (true) {
         int opt = getopt_long(argc, argv, "+:vh",
-                              long_options, &option_index);
+                              long_options.data(), &option_index);
 
         if (opt == -1)
             break;
@@ -58,10 +57,10 @@ int App::parseArgs(int argc, char * argv[]) {
         switch (opt) {
 
         case 0:
-            printf("option %s", long_options[option_index].name);
-            if (optarg)
-                printf(" with arg %s", optarg);
-            printf("\n");
+//            printf("option %s", long_options[option_index].name);
+  //          if (optarg)
+    //            printf(" with arg %s", optarg);
+      //      printf("\n");
             break;
 
         case 'v':
@@ -74,7 +73,7 @@ int App::parseArgs(int argc, char * argv[]) {
 
         case '?': {
             charBuf[0] = static_cast<char>(optopt);
-            std::cerr << "error: bad option: " << charBuf << "\n";
+            std::cerr << "error: bad option: " << charBuf.data() << "\n";
             std::cerr << _usage << "\n";
             _error = 1;
         }
@@ -82,7 +81,7 @@ int App::parseArgs(int argc, char * argv[]) {
 
         case ':': {
             charBuf[0] = static_cast<char>(optopt);
-            std::cerr << "error: mission argument for option: " << charBuf << "\n";
+            std::cerr << "error: mission argument for option: " << charBuf.data() << "\n";
             std::cerr << _usage << "\n";
             _error = 1;
         }
@@ -118,7 +117,7 @@ std::shared_ptr<App> App::create() {
     return app;
 }
 
-int App::run(int argc, char *argv[]) {
+int App::run(int argc, char **argv) {
 
     std::stringstream ss;
 

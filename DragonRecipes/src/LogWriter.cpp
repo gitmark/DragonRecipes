@@ -23,52 +23,61 @@ std::vector<LogWriterPtr> &LogWriters() {
 
 class LogListenerPrivate {
   public:
-    LogListenerPrivate(std::function<void(const std::string&)> lambda) : lambda(lambda) {}
-    virtual ~LogListenerPrivate();
+      LogListenerPrivate(std::function<void(const std::string&)> lambda) : lambda(std::move(lambda)) {}
+    LogListenerPrivate(const LogListenerPrivate &logListenerPrivate) = default;
+    LogListenerPrivate(LogListenerPrivate &&Error) noexcept = default;
+    LogListenerPrivate &operator=(const LogListenerPrivate &Error) = default;
+    LogListenerPrivate &operator=(LogListenerPrivate &&Error) noexcept = default;
+    virtual ~LogListenerPrivate() = default;
 
+private:
     std::function<void(const std::string&)> lambda;
+
+    friend LogListener;
 };
 
-LogListenerPrivate::~LogListenerPrivate() {}
-
-LogListener::LogListener(std::function<void(const std::string&)> lambda) : data(new LogListenerPrivate(lambda)) {
+LogListener::LogListener(std::function<void(const std::string&)> lambda) : data(new LogListenerPrivate(std::move(lambda))) {
 }
 
 LogListener::~LogListener() {
+    data.reset(nullptr);
 }
-
 void LogListener::write(const std::string &msg) {
     data->lambda(msg);
 }
 
 class LogWriterPrivate {
   public:
-    LogWriterPrivate() {}
-    virtual ~LogWriterPrivate();
+      LogWriterPrivate() = default;
+      LogWriterPrivate(const LogWriterPrivate &logWriterPrivate) = default;
+      LogWriterPrivate(LogWriterPrivate &&logWriterPrivate) noexcept = default;
+      LogWriterPrivate &operator=(const LogWriterPrivate &logWriterPrivate) = default;
+      LogWriterPrivate &operator=(LogWriterPrivate &&logWriterPrivate) noexcept = default;
+    virtual ~LogWriterPrivate() = default;
 
+private:
     std::vector<LogListenerPtr> Listeners;
+    friend LogWriter;
 };
-
-LogWriterPrivate::~LogWriterPrivate() {}
-
 
 LogWriter::LogWriter() : data(new LogWriterPrivate()) {}
 
 LogWriter::~LogWriter() {
+    data.reset(nullptr);
 }
 
-void LogWriter::addListener(LogListenerPtr listener) {
+void LogWriter::addListener(const LogListenerPtr &listener) {
     data->Listeners.push_back(listener);
 }
 
-void LogWriter::setListener(LogListenerPtr listener) {
+void LogWriter::setListener(const LogListenerPtr &listener) {
     data->Listeners.clear();
     data->Listeners.push_back(listener);
 }
 
 void LogWriter::write(const char *buf, int count) {
     std::string msg(buf, static_cast<size_t>(count));
-    for (auto Listener : data->Listeners)
+    for (const auto &Listener : data->Listeners)
         Listener->write(msg);
 }
 

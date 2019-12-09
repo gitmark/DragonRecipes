@@ -9,13 +9,13 @@ namespace dragon {
 
 namespace log {
 LogWriter debugLogWriter;
-LogStream debug(&infoLogWriter);
+LogStream debug(&debugLogWriter);
 LogWriter infoLogWriter;
 LogStream info(&infoLogWriter);
 LogWriter warnLogWriter;
-LogStream warn(&infoLogWriter);
+LogStream warn(&warnLogWriter);
 LogWriter errorLogWriter;
-LogStream error(&infoLogWriter);
+LogStream error(&errorLogWriter);
 }
 
 }

@@ -27,17 +27,15 @@
 #include "Version.h"
 #include "mainwindow.h"
 
-namespace dragon {
+namespace castle {
 
 std::weak_ptr<App> App::_theApp;
 
 App::App() :
-    _argc(0), _argv(nullptr),
-    _version(false), _help(false),
-    _versionNum(CASTLE_VERSION),
-    _devStage(CASTLE_DEV_STAGE),
-    _error(0)
+    _versionNum(appVersion()),
+    _devStage(appDevStage())
 {}
+
 
 int App::parseArgs(int argc, char **argv) {
     std::string optLong;
@@ -70,7 +68,7 @@ int App::parseArgs(int argc, char **argv) {
             break;
 
         case 'c':
-            optLong = long_options[option_index].name;
+            optLong = long_options[static_cast<size_t>(option_index)].name;
             _filename = optarg;
             break;
 

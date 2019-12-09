@@ -40,7 +40,7 @@ class LogStream_ : public B {
 
 template<class B, class T, class A>
 LogStream_<B,T,A>::LogStream_(A *logWriter)
-    : std::ios(0), B(&sb), sb(logWriter,STREAM_BUF_SIZE), logWriter(logWriter)
+    : std::ios(nullptr), B(&sb), sb(logWriter,STREAM_BUF_SIZE), logWriter(logWriter)
 {}
 
 template<class B, class T, class A>
@@ -58,8 +58,8 @@ void LogStream_<B,T,A>::clearError() {
     return sb.clearError();
 }
 
-typedef LogStream_<std::iostream, LogBuf<LogWriter, LogWriter,
-        AssignBuf<LogWriter,LogWriter>>, LogWriter> LogStream;
+using LogStream = LogStream_<std::iostream, LogBuf<LogWriter, LogWriter,
+        AssignBuf<LogWriter,LogWriter>>, LogWriter>;
 
 namespace log {
 DRAGON_EXPORT extern LogWriter debugLogWriter;

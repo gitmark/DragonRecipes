@@ -7,29 +7,39 @@
 #define SYMBOL_PRIVATE_H
 
 #include <string>
+#include <vector>
 
 #include <DragonRecipes/Symbol.h>
 
-#define SYMBOL_TYPE_COUNT 3
-
 namespace dragon {
 class Symbol;
+class Token;
 
 class SymbolPrivate {
   public:
-    SymbolPrivate(const std::string &name = "", int id = 0, Symbol::Type type = Symbol::unknown) :
-        name(name), id(id), type(type) {}
-    virtual ~SymbolPrivate() {}
+      SymbolPrivate(std::string name = std::string(), int id = 0, Symbol::Type type = Symbol::unknown) :
+          name(std::move(name)), id(id), type(type) {}
 
-    static std::string at(const int index) {
-        return *(typeStrings + index);
+      SymbolPrivate(const SymbolPrivate &symbolPrivate) = default;
+      SymbolPrivate(SymbolPrivate &&symbolPrivate) noexcept = default;
+      SymbolPrivate &operator=(const SymbolPrivate &symbolPrivate) = default;
+      SymbolPrivate &operator=(SymbolPrivate &&symbolPrivate) noexcept = default;
+      virtual ~SymbolPrivate() = default;
+
+
+    static std::string at(size_t index) {
+        return typeStrings[index];
 
     }
+
+private:
     std::string name;
     int id;
     Symbol::Type type;
-    static const char *typeStrings[SYMBOL_TYPE_COUNT];
+    static std::vector<std::string> typeStrings;
+
     friend Symbol;
+    friend Token;
 };
 
 }

@@ -50,8 +50,11 @@ class LogBuf : public std::streambuf {
         char *end = &_inBuffer.front() + _inBuffer.size();
         setg(end, end, end);
     }
+//    LogBuf(LogBuf<P,S,A> &&logBuf) noexcept;
+//    LogBuf<P,S,A> &operator=(const LogBuf<P,S,A> &Error);
+//    LogBuf<P,S,A> &operator=(LogBuf<P,S,A> &&Error) noexcept;
 
-    virtual ~LogBuf() {
+    ~LogBuf() override {
         sync();
     }
 
@@ -105,8 +108,13 @@ class LogBuf : public std::streambuf {
 
   private:
     // Don't allow copy or assignment
-    LogBuf(const LogBuf &) = delete;
-    LogBuf &operator= (const LogBuf &) = delete;
+//    LogBuf(const LogBuf &) = delete;
+//    LogBuf &operator= (const LogBuf &) = delete;
+  public:
+      LogBuf(LogBuf<P,S,A> &&logBuf) noexcept = delete;
+      LogBuf(LogBuf<P,S,A> &logBuf) = delete;
+    LogBuf<P,S,A> &operator=(const LogBuf<P,S,A> &logBuf) = delete;
+    LogBuf<P,S,A> &operator=(LogBuf<P,S,A> &&logBuf) noexcept = delete;
 
   private:
     P					*logWriter;

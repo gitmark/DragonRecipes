@@ -8,5 +8,5 @@
 #include <DragonRecipes/StringTools.h>
 
 namespace dragon {
-const char *SymbolPrivate::typeStrings[SYMBOL_TYPE_COUNT] = { "unknown", "terminal", "nonterminal" };
+std::vector<std::string> SymbolPrivate::typeStrings = { "unknown", "terminal", "nonterminal" };
 }

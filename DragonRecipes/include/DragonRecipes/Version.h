@@ -8,11 +8,11 @@
 
 #include <string>
 #include <DragonRecipes/Constants.h>
-#include <PrivateHeaders/Version.h>
 
 namespace dragon {
 
 DRAGON_EXPORT std::string dragonRecipesVersion();
+DRAGON_EXPORT std::string dragonRecipesDevStage();
 
 }
 

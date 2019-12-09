@@ -20,6 +20,9 @@ class DRAGON_EXPORT Production {
     Production(const std::string &head, const std::string &body);
     Production(const Production&) = delete;
     Production(Production&&) = delete;
+    Production &operator=(const Production &production) = delete;
+    Production &operator=(Production &&production) noexcept = delete;
+
     virtual ~Production();
 
     std::vector<std::string> bodyVec();
@@ -28,11 +31,11 @@ class DRAGON_EXPORT Production {
     void print(std::ostream &os);
     std::string toString();
 
-  protected:
-    UniquePtr<ProductionPrivate> data;
+  private:
+      std::unique_ptr<ProductionPrivate> data;
 };
 
-typedef std::shared_ptr<Production> ProdPtr;
+using ProdPtr = std::shared_ptr<Production>;
 
 inline ProdPtr newProduction(const std::string &head, const std::string &body) {
     return std::make_shared<Production>(head,body);

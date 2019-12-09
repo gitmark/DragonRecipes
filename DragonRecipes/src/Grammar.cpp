@@ -20,12 +20,6 @@ bool compareSymbol(const SymbolPtr &sp1, const SymbolPtr &sp2) {
 
 class GrammarPrivate {
   public:
-    GrammarPrivate() :
-        termFirstId(-1),
-        termLastId(-1),
-        nontermFirstId(-1),
-        nontermLastId(-1)
-    {}
 
     int firstInBody(const std::string &body, std::set<std::string> &firstSet) const {
         std::vector<std::string> parts;
@@ -38,7 +32,7 @@ class GrammarPrivate {
             first(p, first1);
 
             // Add everything except e (empty)
-            for(auto f : first1) {
+            for(const auto &f : first1) {
                 if (f != "e")
                     firstSet.insert(f);
             }
@@ -60,7 +54,7 @@ class GrammarPrivate {
     int first(const std::string &x, std::set<std::string> &firstSet) const {
 
         auto &m = productions;
-        if (x.find(" ") != std::string::npos)
+        if (x.find(' ') != std::string::npos)
             return firstInBody(x, firstSet);
 
         if (!m.count(x)) {
@@ -72,7 +66,7 @@ class GrammarPrivate {
         // nonterminal, get productions
         auto vec = m.at(x);
 
-        for(auto prod : vec) {
+        for(const auto &prod : vec) {
             firstInBody(prod->body(), firstSet);
         }
 
@@ -84,6 +78,7 @@ class GrammarPrivate {
         nontermSet.insert(head);
     }
 
+private:
     std::map<std::string, std::vector<ProdPtr>> productions;
     std::vector<std::string> nontermVec;
     std::vector<std::string> termVec;
@@ -92,25 +87,52 @@ class GrammarPrivate {
     std::vector<SymbolPtr> terminals;
     std::vector<SymbolPtr> nonterminals;
     std::string startSymbol;
-    int termFirstId;
-    int termLastId;
-    int nontermFirstId;
-    int nontermLastId;
+    int termFirstId{-1};
+    int termLastId{-1};
+    int nontermFirstId{-1};
+    int nontermLastId{-1};
     ErrorPtr lastError;
+
+    friend class Grammar;
 };
 
-UNIQUE_PTR_IMPL(GrammarPrivate)
 
 Grammar::Grammar() :
     data(new GrammarPrivate()) {}
 
-Grammar::~Grammar() {}
 
-void Grammar::add(std::shared_ptr<Production> production) {
+Grammar::Grammar(std::unique_ptr<GrammarPrivate> &&ptr) :
+    data(std::move(ptr)) {}
+
+Grammar::Grammar(const Grammar &grammar) :
+    data(new GrammarPrivate()) {
+    *data = *grammar.data;
+}
+
+Grammar::Grammar(Grammar &&grammar) noexcept :
+    data(new GrammarPrivate()) {
+    std::swap(data, grammar.data);
+}
+
+Grammar &Grammar::operator=(const Grammar &grammar) {
+    *data = *grammar.data;
+    return *this;
+}
+
+Grammar &Grammar::operator=(Grammar &&grammar) noexcept {
+    std::swap(data, grammar.data);
+    return *this;
+}
+
+Grammar::~Grammar() {
+    data.reset(nullptr);
+}
+
+void Grammar::add(const std::shared_ptr<Production> &production) {
     data->productions[production->head()].push_back(production);
 }
 
-void Grammar::add(SymbolPtr symbol) {
+void Grammar::add(const SymbolPtr &symbol) {
     if (symbol->type() == Symbol::term)
         data->terminals.push_back(symbol);
     else if (symbol->type() == Symbol::term)
@@ -145,7 +167,7 @@ void Grammar::print(std::ostream &os) const {
             os << prod->head() << " -> " ;
             auto body = prod->bodyVec();
             bool first = true;
-            for (auto symbol : body) {
+            for (const auto &symbol : body) {
                 if (first) {
                     first = false;
                 } else {
@@ -198,7 +220,7 @@ int Grammar::setTerminals(const std::vector<SymbolPtr> &terminals) {
     data->termSet.clear();
     data->termVec.clear();
 
-    if(!terminals.size())
+    if(terminals.empty())
         return E_SUCCESS;
 
     std::sort(data->terminals.begin(), data->terminals.end(), compareSymbol);
@@ -224,7 +246,7 @@ int Grammar::setNonterminals(const std::vector<SymbolPtr> &nonterminals) {
     data->nontermSet.clear();
     data->nontermVec.clear();
 
-    if(!nonterminals.size())
+    if(nonterminals.empty())
         return E_SUCCESS;
 
     std::sort(data->nonterminals.begin(), data->nonterminals.end(), compareSymbol);

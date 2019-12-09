@@ -11,21 +11,23 @@ namespace dragon {
 
 class ProductionPrivate {
   public:
-    ProductionPrivate(const std::string &head, const std::string &body) :
-        head(head) {
+    ProductionPrivate(std::string head, const std::string &body) :
+          head(std::move(head)) {
         split(body, " ", this->body);
     }
 
+private:
     std::string head;
     std::vector<std::string> body;
+    friend class Production;
 };
-
-UNIQUE_PTR_IMPL(ProductionPrivate)
 
 Production::Production(const std::string &head, const std::string &body) :
     data(new ProductionPrivate(head, body)) {}
 
-Production::~Production() {}
+Production::~Production() {
+    data.reset(nullptr);
+}
 
 std::vector<std::string> Production::bodyVec() {
     return data->body;

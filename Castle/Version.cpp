@@ -3,17 +3,17 @@
    distributed under the MIT License. See LICENSE.TXT for details.
   --------------------------------------------------------------------------*/
 
-#include "mainwindow.h"
-#include <QApplication>
-#include <QDir>
-#include <QCoreApplication>
+#include <string>
+#include "Version.h"
 
-#include <iostream>
-#include <getopt.h>
-#include <DragonRecipes.h>
-#include "App.h"
+namespace castle {
 
-int main(int argc, char *argv[]) {
-    auto app = castle::App::create();
-    return app->run(argc, argv);
+std::string appVersion() {
+    return "0.0.0";
+}
+
+std::string appDevStage() {
+    return "alpha";
+}
+
 }

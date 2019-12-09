@@ -4,7 +4,6 @@
   --------------------------------------------------------------------------*/
 
 #include <string>
-#include <PrivateHeaders/Version.h>
 #include <DragonRecipes/Version.h>
 
 #include <iostream>
@@ -12,7 +11,11 @@
 namespace dragon {
 
 std::string dragonRecipesVersion() {
-    return std::string(DRAGON_RECIPES_VERSION) + " " + DRAGON_RECIPES_DEV_STAGE;
+    return "0.0.0";
+}
+
+std::string dragonRecipesDevStage() {
+    return "alpha";
 }
 
 }

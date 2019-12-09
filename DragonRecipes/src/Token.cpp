@@ -17,21 +17,46 @@ namespace dragon {
 class TokenPrivate : public SymbolPrivate {
   public:
     TokenPrivate(const std::string &_name = "", int _id = 0, int line = 0, int col = 0) :
-        SymbolPrivate(_name, _id, Symbol::term), col(col), error(0), line(line), start(0) {}
+          SymbolPrivate(_name, _id, Symbol::term), line(line), col(col) {}
 
+private:
     int col;
-    int error;
+    int error{0};
     std::string errorString;
     std::string lexeme;
     int line;
-    int start;
+    int start{0};
+
+    friend class Token;
 };
 
 Token::Token(const std::string &name, int id, int line, int col) :
-    Symbol(std::unique_ptr<TokenPrivate>(new TokenPrivate(name, id, line, col))) {
+    Symbol(std::make_unique<TokenPrivate>(name, id, line, col)) {
 }
 
+Token::Token(const Token &token) :
+    Symbol(std::make_unique<TokenPrivate>()) {
+    *data = *token.data;
+}
+
+Token::Token(Token &&token) noexcept :
+    Symbol(std::make_unique<TokenPrivate>()) {
+    std::swap(data, token.data);
+}
+
+Token &Token::operator=(const Token &token) {
+    *data = *token.data;
+    return *this;
+}
+
+Token &Token::operator=(Token &&token) noexcept {
+    std::swap(data, token.data);
+    return *this;
+}
+
+
 Token::~Token() {
+    data.reset(nullptr);
 }
 
 void Token::print(std::ostream &os) const {

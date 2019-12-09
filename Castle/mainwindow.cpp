@@ -22,6 +22,7 @@
 
 using namespace dragon;
 
+namespace castle {
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow) {
@@ -48,7 +49,7 @@ void MainWindow::on_pushButton_clicked() {
     }));
 
     std::string text;
-    if (_filename.size()) {
+    if (!_filename.empty()) {
         std::ifstream t(_filename);
         std::stringstream buffer;
         buffer << t.rdbuf();
@@ -98,7 +99,7 @@ void MainWindow::on_pushButton_clicked() {
 
     ss << production->head() << "\n\n";
 
-    for(auto p : parts) {
+    for(auto const &p : parts) {
         ss << p << "\n";
     }
 
@@ -106,3 +107,4 @@ void MainWindow::on_pushButton_clicked() {
     log::error.flush();
 }
 
+}
