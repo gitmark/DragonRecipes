@@ -13,16 +13,23 @@
 #define SYMBOL_TYPE_COUNT 3
 
 namespace dragon {
+class Symbol;
+
 class SymbolPrivate {
   public:
     SymbolPrivate(const std::string &name = "", int id = 0, Symbol::Type type = Symbol::unknown) :
         name(name), id(id), type(type) {}
-    virtual ~SymbolPrivate();
+    virtual ~SymbolPrivate() {}
 
+    static std::string at(const int index) {
+        return *(typeStrings + index);
+
+    }
     std::string name;
     int id;
     Symbol::Type type;
     static const char *typeStrings[SYMBOL_TYPE_COUNT];
+    friend Symbol;
 };
 
 }

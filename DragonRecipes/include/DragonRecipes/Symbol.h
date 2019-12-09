@@ -11,7 +11,7 @@
 #include <DragonRecipes/Constants.h>
 
 namespace dragon {
-
+class Token;
 class SymbolPrivate;
 
 class DRAGON_EXPORT Symbol {
@@ -19,11 +19,15 @@ class DRAGON_EXPORT Symbol {
     enum Type {unknown, term, nonterm};
 
     Symbol(const std::string &name = "", int id = 0, Type type = unknown);
-    Symbol(UniquePtr<SymbolPrivate> &&ptr);
+    Symbol(std::unique_ptr<SymbolPrivate> &&ptr);
+    Symbol(const Symbol &symbol);
+    Symbol(Symbol &&symbol) noexcept;
+    Symbol &operator=(const Symbol &symbol);
+    Symbol &operator=(Symbol &&symbol) noexcept;
     virtual ~Symbol();
 
     int id() const;
-    const std::string name() const;
+    std::string name() const;
     Type type() const;
     std::string typeStr() const;
 
@@ -35,11 +39,13 @@ class DRAGON_EXPORT Symbol {
     std::string toString() const;
 
 
-  protected:
-    UniquePtr<SymbolPrivate> data;
+  private:
+      std::unique_ptr<SymbolPrivate> data;
+
+    friend Token;
 };
 
-typedef std::shared_ptr<Symbol> SymbolPtr;
+using SymbolPtr = std::shared_ptr<Symbol>;
 
 inline SymbolPtr newSymbol(const std::string &name = "", int id = 0, Symbol::Type type = Symbol::unknown) {
     return std::make_shared<Symbol>(name, id, type);

@@ -9,7 +9,7 @@
 #include <DragonRecipes/LogBuf.h>
 #include <DragonRecipes/LogWriter.h>
 
-#define STREAM_BUF_SIZE 10000
+constexpr int STREAM_BUF_SIZE = 10000;
 // References:
 // http://www.mr-edd.co.uk/blog/beginners_guide_streambuf
 // http://stackoverflow.com/questions/21420526/implementing-stdbasic-streambuf-subclass-for-manipulating-input

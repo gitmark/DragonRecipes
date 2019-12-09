@@ -25,8 +25,7 @@ UNIQUE_PTR_IMPL(ProductionPrivate)
 Production::Production(const std::string &head, const std::string &body) :
     data(new ProductionPrivate(head, body)) {}
 
-Production::~Production() {
-}
+Production::~Production() {}
 
 std::vector<std::string> Production::bodyVec() {
     return data->body;

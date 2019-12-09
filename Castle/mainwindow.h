@@ -23,7 +23,7 @@ class MainWindow : public QMainWindow {
 
   public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    ~MainWindow() override;
     int init(const std::string &filename);
 
   protected:

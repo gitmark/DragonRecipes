@@ -9,17 +9,36 @@
 #include <DragonRecipes/StringTools.h>
 
 namespace dragon {
-SymbolPrivate::~SymbolPrivate() {};
 
-UNIQUE_PTR_IMPL(SymbolPrivate)
 
 Symbol::Symbol(const std::string &name, int id, Type type) :
     data(new SymbolPrivate(name, id, type)) {}
 
-Symbol::Symbol(UniquePtr<SymbolPrivate> &&ptr) :
+Symbol::Symbol(std::unique_ptr<SymbolPrivate> &&ptr) :
     data(std::move(ptr)) {}
 
+Symbol::Symbol(const Symbol &symbol) :
+    data(new SymbolPrivate()) {
+    *data = *symbol.data;
+}
+
+Symbol::Symbol(Symbol &&symbol) noexcept :
+    data(new SymbolPrivate()) {
+    std::swap(data, symbol.data);
+}
+
+Symbol &Symbol::operator=(const Symbol &symbol) {
+    *data = *symbol.data;
+    return *this;
+}
+
+Symbol &Symbol::operator=(Symbol &&symbol) noexcept {
+    std::swap(data, symbol.data);
+    return *this;
+}
+
 Symbol::~Symbol() {
+    data.reset(nullptr);
 }
 
 void Symbol::print(std::ostream &os) const {
@@ -38,7 +57,8 @@ std::string Symbol::toString() const {
 int Symbol::id() const {
     return data->id;
 }
-const std::string Symbol::name() const {
+
+std::string Symbol::name() const {
     return data->name;
 }
 
@@ -47,8 +67,9 @@ Symbol::Type Symbol::type() const {
 }
 
 std::string Symbol::typeStr() const {
-    return SymbolPrivate::typeStrings[data->type];
+    return SymbolPrivate::at(data->type);
 }
+
 
 void Symbol::setId(int id) {
     data->id = id;

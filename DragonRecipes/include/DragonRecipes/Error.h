@@ -14,10 +14,10 @@
 namespace dragon {
 
 class ErrorPrivate;
-#define E_SUCCESS 0
-#define E_TERM_OUT_OF_RANGE 1
-#define E_NONTERM_OUT_OF_RANGE 2
-#define E_UNKNOWN_SYMBOL 3
+constexpr int E_SUCCESS = 0;
+constexpr int E_TERM_OUT_OF_RANGE = 1;
+constexpr int E_NONTERM_OUT_OF_RANGE = 2;
+constexpr int E_UNKNOWN_SYMBOL = 3;
 
 class DRAGON_EXPORT Error {
   public:

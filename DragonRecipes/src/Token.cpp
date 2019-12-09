@@ -28,7 +28,7 @@ class TokenPrivate : public SymbolPrivate {
 };
 
 Token::Token(const std::string &name, int id, int line, int col) :
-    Symbol(new TokenPrivate(name, id, line, col)) {
+    Symbol(std::unique_ptr<TokenPrivate>(new TokenPrivate(name, id, line, col))) {
 }
 
 Token::~Token() {

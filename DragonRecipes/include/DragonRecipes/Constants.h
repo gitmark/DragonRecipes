@@ -49,6 +49,15 @@ class DRAGON_EXPORT UniquePtr {
         return ptr;
     }
 
+    T &operator*() {
+        return *ptr;
+    }
+
+    T & operator*() const {
+        return *ptr;
+    }
+
+
   private:
     T *ptr;
 };

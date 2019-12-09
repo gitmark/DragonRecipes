@@ -18,8 +18,8 @@ class App {
     virtual ~App() {}
 
     static std::shared_ptr<App> create();
-    virtual int run(int argc, char * argv[]);
-    virtual int parseArgs(int argc, char * argv[]);
+    virtual int run(int argc, char **argv);
+    virtual int parseArgs(int argc, char **argv);
     static std::shared_ptr<App> app();
 
   protected:

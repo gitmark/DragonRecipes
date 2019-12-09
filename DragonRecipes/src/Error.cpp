@@ -17,6 +17,8 @@ class ErrorPrivate {
     ErrorPrivate(int num, const std::string &msg) :
         num(num), msg(msg) {}
 
+    virtual ~ErrorPrivate() {}
+
     int num;
     std::string msg;
     static const char *errorNames[ERROR_NUM_COUNT];

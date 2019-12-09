@@ -11,11 +11,11 @@
 #include <algorithm>
 #include <vector>
 
-#define DEFAULT_BUF_SIZE 10000
-#define DEFAULT_PUT_BACK 8
-#define MIN_PUT_BACK 1
-#define SUCCESS 0
-#define ERROR 1
+constexpr int DEFAULT_BUF_SIZE = 10000;
+    constexpr int DEFAULT_PUT_BACK = 8;
+    constexpr int MIN_PUT_BACK = 1;
+    constexpr int SUCCESS = 0;
+    constexpr int ERROR = 1;
 
 // References:
 // http://www.mr-edd.co.uk/blog/beginners_guide_streambuf
@@ -105,8 +105,8 @@ class LogBuf : public std::streambuf {
 
   private:
     // Don't allow copy or assignment
-    LogBuf(const LogBuf &);
-    LogBuf &operator= (const LogBuf &);
+    LogBuf(const LogBuf &) = delete;
+    LogBuf &operator= (const LogBuf &) = delete;
 
   private:
     P					*logWriter;

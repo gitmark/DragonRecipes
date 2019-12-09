@@ -14,7 +14,7 @@
 namespace dragon {
 
 inline std::string trim(const std::string &str) {
-    if (!str.size())
+    if (str.empty())
         return str;
 
     size_t start = str.find_first_not_of(" \t\r\n");
@@ -36,13 +36,13 @@ inline void split(const std::string &str,
 
     vec.clear();
 
-    if (!str.size())
+    if (str.empty())
         return;
 
     size_t tokenStart = 0;
     size_t delimStart = 0;
 
-    while(1) {
+    while(true) {
         tokenStart = str.find_first_not_of(delim, delimStart);
 
         if (tokenStart == std::string::npos)

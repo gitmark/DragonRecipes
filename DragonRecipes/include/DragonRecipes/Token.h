@@ -14,6 +14,7 @@
 namespace dragon {
 
 class TokenPrivate;
+class Symbol;
 
 class DRAGON_EXPORT Token : public Symbol {
   public:
@@ -35,7 +36,6 @@ class DRAGON_EXPORT Token : public Symbol {
     void setStart(int start);
     void print(std::ostream &os) const;
     std::string toString() const;
-
 };
 
 typedef std::shared_ptr<Token> TokenPtr;

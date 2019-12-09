@@ -3,8 +3,8 @@
    distributed under the MIT License. See LICENSE.TXT for details.
   --------------------------------------------------------------------------*/
 
-#include <errno.h>
-#include <string.h>
+#include <cerrno>
+#include <cstring>
 #include <getopt.h>
 #include <iostream>
 #include <fstream>
@@ -39,12 +39,12 @@ App::App() :
     _error(0)
 {}
 
-int App::parseArgs(int argc, char * argv[]) {
+int App::parseArgs(int argc, char **argv) {
     std::string optLong;
     std::string optArg;
-    char charBuf[2] = {0};
+    std::vector<char> charBuf(2);
 
-    static struct option long_options[] = {
+    static std::vector<struct option> long_options = {
         { "config",	required_argument,			nullptr,			'c' },
         { "version",	no_argument,			nullptr,			'v' },
         { "help",		no_argument,			nullptr,			'h' },
@@ -55,7 +55,7 @@ int App::parseArgs(int argc, char * argv[]) {
 
     while (true) {
         int opt = getopt_long(argc, argv, "+:vhc:",
-                              long_options, &option_index);
+                              long_options.data(), &option_index);
 
         if (opt == -1)
             break;
@@ -63,10 +63,10 @@ int App::parseArgs(int argc, char * argv[]) {
         switch (opt) {
 
         case 0:
-            printf("option %s", long_options[option_index].name);
-            if (optarg)
-                printf(" with arg %s", optarg);
-            printf("\n");
+            //printf("option %s", long_options[option_index].name);
+            //if (optarg)
+              //  printf(" with arg %s", optarg);
+            //printf("\n");
             break;
 
         case 'c':
@@ -84,7 +84,7 @@ int App::parseArgs(int argc, char * argv[]) {
 
         case '?': {
             charBuf[0] = static_cast<char>(optopt);
-            std::cerr << "error: bad option: " << charBuf << "\n";
+            std::cerr << "error: bad option: " << charBuf.data() << "\n";
             std::cerr << _usage << "\n";
             _error = 1;
         }
@@ -92,7 +92,7 @@ int App::parseArgs(int argc, char * argv[]) {
 
         case ':': {
             charBuf[0] = static_cast<char>(optopt);
-            std::cerr << "error: mission argument for option: " << charBuf << "\n";
+            std::cerr << "error: mission argument for option: " << charBuf.data() << "\n";
             std::cerr << _usage << "\n";
             _error = 1;
         }
@@ -128,7 +128,7 @@ std::shared_ptr<App> App::create() {
     return app;
 }
 
-int App::run(int argc, char *argv[]) {
+int App::run(int argc, char **argv) {
     std::stringstream ss;
 
     ss << "Usage: castle [-v] [-h]\n";
@@ -152,11 +152,11 @@ int App::run(int argc, char *argv[]) {
     dir.cdUp();
     dir.cd("plugins");
     QCoreApplication::setLibraryPaths(QStringList(dir.absolutePath()));
-    a.setWindowIcon(QIcon(":/images/castle.icns"));
+    QApplication::setWindowIcon(QIcon(":/images/castle.icns"));
     MainWindow w;
     w.init(_filename);
     w.show();
-    return a.exec();
+    return QApplication::exec();
 }
 
 }

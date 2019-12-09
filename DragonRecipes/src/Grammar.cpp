@@ -104,8 +104,7 @@ UNIQUE_PTR_IMPL(GrammarPrivate)
 Grammar::Grammar() :
     data(new GrammarPrivate()) {}
 
-Grammar::~Grammar() {
-}
+Grammar::~Grammar() {}
 
 void Grammar::add(std::shared_ptr<Production> production) {
     data->productions[production->head()].push_back(production);
