@@ -36,7 +36,8 @@ std::vector<std::string> ErrorPrivate::errorNames = {
     "SUCCESS",
     "TERM_OUT_OF_RANGE",
     "NONTERM_OUT_OF_RANGE",
-    "UNKNOWN_ERROR"
+    "UNKNOWN_ERROR",
+    "START_SYMBOL_NOT_SET"
 };
 
 Error::Error(int num, const std::string &msg) :

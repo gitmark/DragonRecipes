@@ -13,6 +13,8 @@
 #include <DragonRecipes/Token.h>
 #include <DragonRecipes/Log.h>
 
+//using namespace std;
+
 namespace dragon {
 bool compareSymbol(const SymbolPtr &sp1, const SymbolPtr &sp2) {
     return (sp1->id() < sp2->id());
@@ -73,12 +75,173 @@ class GrammarPrivate {
         return 0;
     }
 
+    int follow(const std::string &x, std::set<std::string> &followSet, const std::string &startSymbol1) const {
+
+        const std::map<std::string, std::vector<ProdPtr>> &m = productions;
+        if (x == startSymbol1)
+            followSet.insert("$");
+
+        for (auto mpair : m) {
+            for(auto prod : mpair.second) {
+                std::vector<std::string> parts;
+                split(prod->body(), " ", parts);
+
+                for (size_t i = 0; i < parts.size(); ++i) {
+                    auto p = parts[i];
+
+                    if (p == x) {
+
+                        for (size_t j = i; j < parts.size(); ++j) {
+                            auto p = parts[j];
+
+                            if (p != x) {
+
+                                std::set<std::string> first1;
+                                first(p, first1);
+
+                                // Add everything except e
+                                for(auto f : first1) {
+                                    if (f != "e")
+                                        followSet.insert(f);
+                                }
+
+                                if (!first1.count("e")) {
+                                    break;
+                                }
+                            }
+
+                            if (j == parts.size() - 1) {
+                                if (prod->head() != p) {
+                                    follow(prod->head(), followSet, startSymbol1);
+                                }
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    int createTable() {
+        table.clear();
+        const std::map<std::string, std::vector<ProdPtr>> &m = productions;
+
+        for (auto nonterm : nontermVec) {
+            auto vec = m.at(nonterm);
+
+            std::set<std::string> first1;
+            first(nonterm, first1);
+            std::set<std::string> follow1;
+            follow(nonterm, follow1, startSymbol);
+
+            ProdPtr prod1;
+            ProdPtr prod2;
+
+            std::map<std::string, ProdPtr> termToProd;
+
+            for(auto prod : vec) {
+
+                std::set<std::string> bodyFirst;
+                first(prod->body(), bodyFirst);
+
+                for (auto t : termVec) {
+                    if (bodyFirst.count(t)) {
+                        termToProd[t] = prod;
+                    }
+                }
+
+                if (prod->body() == "e")
+                    prod2 = prod;
+                else
+                    prod1 = prod;
+            }
+
+            for (auto term : termVec) {
+
+                if (prod2) {
+                    if (follow1.count(term)) {
+                        table[nonterm][term] = prod2;
+                    }
+                }
+
+                if (first1.count(term)) {
+                    table[nonterm][term] = termToProd[term];
+                }
+            }
+        }
+    }
+
+    int printTable(std::ostream &os) {
+
+        std::vector<std::string> terminals = {"id", "+", "*", "(", ")", "$"};
+        std::vector<std::string> nonterminals = {"E", "E1", "T", "T1", "F"};
+
+        int width = 12;
+        std::string padding1(width, ' ');
+        std::string line((width+1)*(terminals.size() + 1), '-');
+        os << line << "\n";
+        os << padding1 << "|";
+        for (auto term : terminals) {
+            std::string leftPadding((width - term.size())/2, ' ');
+            std::string entry = leftPadding + term;
+            os << entry;
+            std::string padding(width - entry.size(), ' ');
+            os << padding << "|";
+        }
+        os << "\n";
+
+        for (auto nonterm : nonterminals) {
+            os << line << "\n";
+            std::string leftPadding((width - nonterm.size())/2, ' ');
+            std::string entry = leftPadding + nonterm;
+            os << entry;
+            std::string padding(width - entry.size(), ' ');
+            os << padding << "|";
+            for (auto term : terminals) {
+                ProdPtr prod;
+                if (table.at(nonterm).count(term))
+                    prod = table.at(nonterm).at(term);
+                std::string val;
+                std::string entry;
+                if (prod) {
+                    val = nonterm + "->";
+                    std::vector<std::string> vec;
+                    split(prod->body(), " ", vec);
+                    std::string body;
+                    for (auto item : vec) {
+                        body += item;
+                    }
+                    val += body;
+                    std::string leftPadding((width - val.size())/2, ' ');
+                    entry = leftPadding + val;
+                }
+
+                os << entry;
+                std::string padding(width - entry.size(), ' ');
+                os << padding << "|";
+            }
+            os << "\n";
+        }
+        os << line << "\n";
+
+        os << "\n";
+
+        return 0;
+    }
+
+
     void add(const std::string &head, const std::string &body) {
         productions[head].push_back(newProduction(head,body));
         nontermSet.insert(head);
     }
 
 private:
+    std::map<std::string, std::map<std::string, ProdPtr>> table;
     std::map<std::string, std::vector<ProdPtr>> productions;
     std::vector<std::string> nontermVec;
     std::vector<std::string> termVec;
@@ -128,6 +291,14 @@ Grammar::~Grammar() {
     data.reset(nullptr);
 }
 
+int Grammar::createTable() {
+    return data->createTable();
+}
+
+int Grammar::printTable(std::ostream &os) {
+    return data->printTable(os);
+}
+
 void Grammar::add(const std::shared_ptr<Production> &production) {
     data->productions[production->head()].push_back(production);
 }
@@ -142,7 +313,7 @@ void Grammar::add(const SymbolPtr &symbol) {
     }
 }
 
-void Grammar::print(std::ostream &os) const {
+void Grammar::print(std::ostream &os) {
     // Print terminals
     os << "terminals:\n";
     for(auto &term : data->terminals) {
@@ -195,9 +366,31 @@ void Grammar::print(std::ostream &os) const {
 
         os << "\n";
     }
+
+    os << "\n";
+
+    // Print FOLLOW sets
+
+    for(auto &nonterm : nontermVec()) {
+        os << "FOLLOW(" << nonterm << ") =";
+        std::set<std::string> follow1;
+        follow(nonterm, follow1, startSymbol());
+
+        for(auto &symbol : follow1) {
+            os << " ";
+            os << symbol;
+        }
+
+        os << "\n";
+    }
+
+    createTable();
+    printTable(os);
+
+
 }
 
-std::string Grammar::toString() const {
+std::string Grammar::toString() {
     std::stringstream ss;
     print(ss);
     return ss.str();
@@ -207,12 +400,21 @@ int Grammar::first(const std::string &x, std::set<std::string> &first) const {
     return data->first(x, first);
 }
 
+
+int Grammar::follow(const std::string &x, std::set<std::string> &followSet, const std::string &startSymbol1) const {
+    return data->follow(x,followSet,startSymbol1);
+}
+
 const std::vector<std::string> &Grammar::nontermVec() const {
     return data->nontermVec;
 }
 
 const std::vector<std::string> &Grammar::termVec() const {
     return data->termVec;
+}
+
+std::string Grammar::startSymbol() const {
+    return data->startSymbol;
 }
 
 int Grammar::setTerminals(const std::vector<SymbolPtr> &terminals) {
@@ -226,10 +428,12 @@ int Grammar::setTerminals(const std::vector<SymbolPtr> &terminals) {
     std::sort(data->terminals.begin(), data->terminals.end(), compareSymbol);
 
     if (data->termFirstId >= 0 && data->terminals.front()->id() < data->termFirstId) {
+        log::error << "terminal out of range: " << data->terminals.front()->id() << " is less than the min id " << data->termFirstId << "\n";
         return E_TERM_OUT_OF_RANGE;
     }
 
-    if (data->termFirstId >= 0 && data->terminals.back()->id() > data->termLastId) {
+    if (data->termLastId >= 0 && data->terminals.back()->id() > data->termLastId) {
+        log::error << "terminal out of range: " << data->terminals.back()->id() << " is greater than the max id " << data->termLastId << "\n";
         return E_TERM_OUT_OF_RANGE;
     }
 
@@ -256,7 +460,7 @@ int Grammar::setNonterminals(const std::vector<SymbolPtr> &nonterminals) {
         return E_NONTERM_OUT_OF_RANGE;
     }
 
-    if ((data->nontermFirstId >= 0) && (data->nonterminals.back()->id() > data->nontermLastId)) {
+    if ((data->nontermLastId >= 0) && (data->nonterminals.back()->id() > data->nontermLastId)) {
         log::error << "nonterminal out of range: " << data->nonterminals.back()->id() << " is greater than the max id " << data->nontermLastId << "\n";
         return E_NONTERM_OUT_OF_RANGE;
     }
@@ -277,8 +481,13 @@ void Grammar::setStartSymbol(const std::string& symbol) {
     data->startSymbol = symbol;
 }
 
-void Grammar::updateMembers() {
-
+int Grammar::buildTables() {
+    std::string scope =  "Grammar::buildTables() - ";
+    if (startSymbol() == "") {
+        log::error << scope << "start symbol is not set.\n";
+        return E_START_SYMBOL_NOT_SET;
+    }
+    return E_SUCCESS;
 }
 
 void Grammar::setTerminalRange(int firstId, int lastId) {

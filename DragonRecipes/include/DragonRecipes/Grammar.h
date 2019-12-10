@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <map>
 #include <set>
 #include <map>
 #include <DragonRecipes/Constants.h>
@@ -37,8 +38,10 @@ class DRAGON_EXPORT Grammar {
     void add(const std::shared_ptr<Symbol> &symbol);
 
     int first(const std::string &x, std::set<std::string> &first) const;
-    void print(std::ostream &os) const;
-    std::string toString() const;
+    int follow(const std::string &x, std::set<std::string> &followSet, const std::string &startSymbol) const;
+
+    void print(std::ostream &os);
+    std::string toString();
 
     const std::vector<std::string> &nontermVec() const;
     const std::vector<std::string> &termVec() const;
@@ -51,13 +54,16 @@ class DRAGON_EXPORT Grammar {
     int tokenType(int id) const;
     int tokenType(const std::string &token) const;
 
+    std::string startSymbol() const;
     int setTerminals(const std::vector<SymbolPtr> &terminals);
     int setNonterminals(const std::vector<SymbolPtr> &nonterminals);
     void setProductions(const std::map<std::string, std::vector<ProdPtr>> &productions);
     void setStartSymbol(const std::string& symbol);
-    void updateMembers();
+    int buildTables();
     void setTerminalRange(int firstId, int lastId);
     void setNonterminalRange(int firstId, int lastId);
+    int createTable();
+    int printTable(std::ostream &os);
 
     ErrorPtr lastError();
     void clearLastError();

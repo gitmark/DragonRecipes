@@ -60,36 +60,74 @@ void MainWindow::on_pushButton_clicked() {
 //    log::info.flush();
 
     std::vector<SymbolPtr> terminals;
+    std::vector<SymbolPtr> nonterminals;
 
+    /*
     terminals.push_back(newTerm("a", 1));
     terminals.push_back(newTerm("b", 2));
     terminals.push_back(newTerm("c", 3));
 
-    std::vector<SymbolPtr> nonterminals;
-
     nonterminals.push_back(newNonterm("A", 101));
     nonterminals.push_back(newNonterm("B", 102));
     nonterminals.push_back(newNonterm("C", 103));
+    */
+
+//    std::vector<std::string> terminals = {"id", "+", "*", "(", ")", "$"};
+//    std::vector<std::string> nonterminals = {"E", "E1", "T", "T1", "F"};
+
+    terminals.push_back(newTerm("id", 1));
+    terminals.push_back(newTerm("+", 2));
+    terminals.push_back(newTerm("*", 3));
+    terminals.push_back(newTerm("(", 4));
+    terminals.push_back(newTerm(")", 5));
+    terminals.push_back(newTerm("$", 6));
+
+    nonterminals.push_back(newNonterm("E", 101));
+    nonterminals.push_back(newNonterm("E1", 102));
+    nonterminals.push_back(newNonterm("T", 103));
+    nonterminals.push_back(newNonterm("T1", 104));
+    nonterminals.push_back(newNonterm("F", 105));
 
     GrammarPtr grammar = newGrammar();
 
-    grammar->setTerminalRange(1,3);
-    grammar->setNonterminalRange(102,103);
+    grammar->setTerminalRange(1,6);
+    grammar->setNonterminalRange(101,105);
 
-    grammar->setTerminals(terminals);
-    int rc = grammar->setNonterminals(nonterminals);
+    int rc = grammar->setTerminals(terminals);
 
     if (rc != E_SUCCESS) {
         log::error << errorString(rc) << "\n";
         return;
     }
 
+    rc = grammar->setNonterminals(nonterminals);
+
+    if (rc != E_SUCCESS) {
+        log::error << errorString(rc) << "\n";
+        return;
+    }
+
+    /*
     grammar->add(newProduction("A", "a A"));
     grammar->add(newProduction("A", "b A"));
     grammar->add(newProduction("B", "c"));
     grammar->add(newProduction("C", "B A"));
-    grammar->setStartSymbol("A");
-    grammar->updateMembers();
+*/
+    grammar->add(newProduction("E", "T E1"));
+    grammar->add(newProduction("E1", "+ T E1"));
+    grammar->add(newProduction("E1", "e"));
+    grammar->add(newProduction("T", "F T1"));
+    grammar->add(newProduction("T1", "* F T1"));
+    grammar->add(newProduction("T1", "e"));
+    grammar->add(newProduction("F", "( E )"));
+    grammar->add(newProduction("F", "id"));
+    grammar->setStartSymbol("E");
+    rc = grammar->buildTables();
+
+    if (rc != E_SUCCESS) {
+        log::error << errorString(rc) << "\n";
+        return;
+    }
 
     std::string head = ui->lineEditHead->text().toStdString();
     std::string body = ui->lineEditBody->text().toStdString();
@@ -105,6 +143,7 @@ void MainWindow::on_pushButton_clicked() {
 
     ui->textEditResults->setText(grammar->toString().c_str());
     log::error.flush();
+    ui->textEditResults->setFont (QFont ("Courier", 13));
 }
 
 }

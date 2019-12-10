@@ -17,7 +17,8 @@ class ErrorPrivate;
 constexpr int E_SUCCESS = 0;
 constexpr int E_TERM_OUT_OF_RANGE = 1;
 constexpr int E_NONTERM_OUT_OF_RANGE = 2;
-constexpr int E_UNKNOWN_Error = 3;
+constexpr int E_UNKNOWN_ERROR = 3;
+constexpr int E_START_SYMBOL_NOT_SET = 4;
 
 class DRAGON_EXPORT Error {
   public:
