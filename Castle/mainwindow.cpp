@@ -46,6 +46,7 @@ void MainWindow::on_pushButton_clicked() {
         ui->textEditLog->setText(ui->textEditLog->toPlainText() + str.c_str());
     }));
 
+
     LexerPtr lexer = newLexer();
 
     int id = 0;
@@ -54,7 +55,7 @@ void MainWindow::on_pushButton_clicked() {
     lexer->addTerminal("", ++id, "[-*/+()]+");
     lexer->addTerminal("NAME", ++id, "[_a-zA-Z][_a-zA-Z0-9]*");
 
-    lexer->setSource("1 + 2");
+    lexer->setSource("1 + 2 * 3");
 
     /*
     while (lexer->next()) {
@@ -159,6 +160,8 @@ void MainWindow::on_pushButton_clicked() {
     ui->textEditResults->setText(grammar->toString().c_str());
     log::error.flush();
     ui->textEditResults->setFont (QFont ("Courier", 13));
+
+    ui->textEditLog->setFont (QFont ("Courier", 13));
 
     grammar->runPredictiveParser(error,lexer);
 }

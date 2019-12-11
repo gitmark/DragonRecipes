@@ -4,6 +4,7 @@
 --------------------------------------------------------------------------*/
 
 #include <iostream>
+#include <iomanip>
 #include <set>
 #include <map>
 #include <deque>
@@ -528,17 +529,18 @@ int Grammar::runPredictiveParser(std::ostream &os, LexerPtr lex) {
             continue;
         }
 
-        os << "stack: ";
+ //       os << "stack: ";
         std::string content;
         for(auto s: stack) {
             if (content.size())
                 content += " ";
             content += s;
         }
-        os << content << "\n";
+
+        os << std::setw(20) << std::right << content << "\n";
 
         if (tok->name() == stack.front()) {
-            os << "matched: " << tok->name() << "\n";
+//            os << "matched: " << tok->name() << "\n";
             stack.pop_front();
             lex->next();
             tok = lex->token();
@@ -546,7 +548,7 @@ int Grammar::runPredictiveParser(std::ostream &os, LexerPtr lex) {
             continue;
         }
 
-        os << "tok: " << tok->id() << ", " << tok->name() << ", " << tok->lexeme() << "\n";
+//        os << "tok: " << tok->id() << ", " << tok->name() << ", " << tok->lexeme() << "\n";
 
         ProdPtr prod;
         if (data->table.count(stack.front())) {
@@ -573,7 +575,7 @@ int Grammar::runPredictiveParser(std::ostream &os, LexerPtr lex) {
             return 1;
         }
 
-        os << "body: " << body << "\n";
+//        os << "body: " << body << "\n";
     }
 
     return 0;
