@@ -17,6 +17,7 @@
 #include <DragonRecipes/Token.h>
 #include <DragonRecipes/Production.h>
 #include <DragonRecipes/Error.h>
+#include <DragonRecipes/Lexer.h>
 
 namespace dragon {
 
@@ -67,6 +68,8 @@ class DRAGON_EXPORT Grammar {
 
     ErrorPtr lastError();
     void clearLastError();
+
+    int runPredictiveParser(std::ostream &os, LexerPtr lex);
 
   private:
       std::unique_ptr<GrammarPrivate> data;

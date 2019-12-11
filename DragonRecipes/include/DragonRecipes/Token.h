@@ -18,7 +18,7 @@ class Symbol;
 
 class DRAGON_EXPORT Token : public Symbol {
   public:
-    Token(const std::string &name = "", int id = 0, int line = 0, int col = 0);
+      Token(const std::string &name = "", int id = 0, const std::string &lexeme = "", int line = 0, int col = 0);
     Token(const Token&);
     Token(Token&&) noexcept;
     Token &operator=(const Token &token);
@@ -45,8 +45,8 @@ class DRAGON_EXPORT Token : public Symbol {
 
 using TokenPtr = std::shared_ptr<Token>;
 
-inline TokenPtr newToken(const std::string &name = "", int id = 0, int line = 0, int col = 0) {
-    return std::make_shared<Token>(name, id, line, col);
+inline TokenPtr newToken(const std::string &name = "", int id = 0, const std::string &lexeme = "", int line = 0, int col = 0) {
+    return std::make_shared<Token>(name, id, lexeme, line, col);
 }
 }
 

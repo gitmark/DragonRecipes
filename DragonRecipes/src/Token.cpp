@@ -14,10 +14,11 @@
 #define CPTR const TokenPrivate *ptr = dynamic_cast<const TokenPrivate*>(data.get());
 
 namespace dragon {
+
 class TokenPrivate : public SymbolPrivate {
   public:
-    TokenPrivate(const std::string &_name = "", int _id = 0, int line = 0, int col = 0) :
-          SymbolPrivate(_name, _id, Symbol::term), line(line), col(col) {}
+      TokenPrivate(const std::string &_name = "", int _id = 0, const std::string &lexeme = "", int line = 0, int col = 0) :
+          SymbolPrivate(_name, _id, Symbol::term), lexeme(lexeme), line(line), col(col) {}
 
 private:
     int col;
@@ -30,8 +31,8 @@ private:
     friend class Token;
 };
 
-Token::Token(const std::string &name, int id, int line, int col) :
-    Symbol(std::make_unique<TokenPrivate>(name, id, line, col)) {
+Token::Token(const std::string &name, int id, const std::string &lexeme, int line, int col) :
+    Symbol(std::make_unique<TokenPrivate>(name, id, lexeme, line, col)) {
 }
 
 Token::Token(const Token &token) :
@@ -54,7 +55,6 @@ Token &Token::operator=(Token &&token) noexcept {
     return *this;
 }
 
-
 Token::~Token() {
     data.reset(nullptr);
 }
@@ -70,6 +70,11 @@ std::string Token::toString() const {
     std::stringstream ss;
     print(ss);
     return ss.str();
+}
+
+std::string Token::lexeme() const {
+    CPTR
+    return ptr->lexeme;
 }
 
 int Token::col() const {

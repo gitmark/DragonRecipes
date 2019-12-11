@@ -6,12 +6,14 @@
 #include <iostream>
 #include <set>
 #include <map>
+#include <deque>
 #include <DragonRecipes/Grammar.h>
 #include <DragonRecipes/StringTools.h>
 #include <DragonRecipes/Production.h>
 #include <DragonRecipes/Symbol.h>
 #include <DragonRecipes/Token.h>
 #include <DragonRecipes/Log.h>
+#include <DragonRecipes/Lexer.h>
 
 //using namespace std;
 
@@ -174,6 +176,8 @@ class GrammarPrivate {
                 }
             }
         }
+
+        return 0;
     }
 
     int printTable(std::ostream &os) {
@@ -506,6 +510,73 @@ ErrorPtr Grammar::lastError() {
 
 void Grammar::clearLastError() {
     data->lastError = nullptr;
+}
+
+int Grammar::runPredictiveParser(std::ostream &os, LexerPtr lex) {
+
+    int ws = 2;
+    std::deque<std::string> stack;
+    stack.push_front("$");
+    stack.push_front(startSymbol());
+    lex->next();
+    TokenPtr tok = lex->token();
+
+    while(stack.size()) {
+        if (tok->id() == ws) {
+            lex->next();
+            tok = lex->token();
+            continue;
+        }
+
+        os << "stack: ";
+        std::string content;
+        for(auto s: stack) {
+            if (content.size())
+                content += " ";
+            content += s;
+        }
+        os << content << "\n";
+
+        if (tok->name() == stack.front()) {
+            os << "matched: " << tok->name() << "\n";
+            stack.pop_front();
+            lex->next();
+            tok = lex->token();
+            //            if (!stack.size())
+            continue;
+        }
+
+        os << "tok: " << tok->id() << ", " << tok->name() << ", " << tok->lexeme() << "\n";
+
+        ProdPtr prod;
+        if (data->table.count(stack.front())) {
+            auto m = data->table.at(stack.front());
+            if (m.count(tok->name())) {
+                prod = m.at(tok->name());
+            }
+        }
+
+        std::string body;
+        if (prod) {
+            body = prod->body();
+            std::vector<std::string> parts;
+            split(body, " ", parts);
+            stack.pop_front();
+            for (int i = (int)parts.size() -1; i >= 0; --i) {
+                if (parts[i] == "e")
+                    continue;
+
+                stack.push_front(parts[i]);
+            }
+        } else {
+            os << "SYNTAX ERROR\n";
+            return 1;
+        }
+
+        os << "body: " << body << "\n";
+    }
+
+    return 0;
 }
 
 }

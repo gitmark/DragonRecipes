@@ -17,6 +17,7 @@
 #include <DragonRecipes/Token.h>
 #include <DragonRecipes/Log.h>
 #include <DragonRecipes/Error.h>
+#include <DragonRecipes/Lexer.h>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -38,15 +39,29 @@ int MainWindow::init(const std::string &filename) {
     return 0;
 }
 
+using namespace log;
 void MainWindow::on_pushButton_clicked() {
-
-//    log::info.setListener(newLogListener([&](const std::string &str){
-//        ui->textEditLog->setText(ui->textEditLog->toPlainText() + str.c_str());
-//    }));
 
     log::error.setListener(newLogListener([&](const std::string &str) {
         ui->textEditLog->setText(ui->textEditLog->toPlainText() + str.c_str());
     }));
+
+    LexerPtr lexer = newLexer();
+
+    int id = 0;
+    lexer->addTerminal("id", ++id, "[0-9]+");
+    lexer->addTerminal("S", ++id, "[ \t]+");
+    lexer->addTerminal("", ++id, "[-*/+()]+");
+    lexer->addTerminal("NAME", ++id, "[_a-zA-Z][_a-zA-Z0-9]*");
+
+    lexer->setSource("1 + 2");
+
+    /*
+    while (lexer->next()) {
+        TokenPtr token = lexer->token();
+        error << token->name() << ", " << token->id() << "\n";
+    }
+*/
 
     std::string text;
     if (!_filename.empty()) {
@@ -144,6 +159,8 @@ void MainWindow::on_pushButton_clicked() {
     ui->textEditResults->setText(grammar->toString().c_str());
     log::error.flush();
     ui->textEditResults->setFont (QFont ("Courier", 13));
+
+    grammar->runPredictiveParser(error,lexer);
 }
 
 }
