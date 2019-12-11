@@ -17,7 +17,7 @@ class ProductionPrivate;
 
 class DRAGON_EXPORT Production {
   public:
-    Production(const std::string &head, const std::string &body);
+    Production(const std::string &head, const std::string &body, std::function<int()> action = [](){return 0;});
     Production(const Production&) = delete;
     Production(Production&&) = delete;
     Production &operator=(const Production &production) = delete;
@@ -37,8 +37,8 @@ class DRAGON_EXPORT Production {
 
 using ProdPtr = std::shared_ptr<Production>;
 
-inline ProdPtr newProduction(const std::string &head, const std::string &body) {
-    return std::make_shared<Production>(head,body);
+inline ProdPtr newProduction(const std::string &head, const std::string &body, std::function<int()> action = [](){return 0;}) {
+    return std::make_shared<Production>(head, body, action);
 }
 }
 

@@ -39,6 +39,63 @@ int MainWindow::init(const std::string &filename) {
     return 0;
 }
 
+int F(LexerPtr lexer) {
+    if (lexer->token()->name() == "id") {
+        TokenPtr tok = lexer->token();
+        do {
+            lexer->next();
+        } while(lexer->token()->id() == 2);
+
+        int val = std::atoi(tok->lexeme().c_str());
+        return val;
+    }
+
+    return 0;
+}
+
+int T1(LexerPtr lexer, int input) {
+    if (lexer->token()->name() == "*") {
+        do {
+            lexer->next();
+        } while(lexer->token()->id() == 2);
+
+        int val = F(lexer);
+        return input * T1(lexer, val);
+    } else {
+        return input;
+    }
+}
+
+int T(LexerPtr lexer) {
+    if (lexer->token()->name() == "id") {
+        int val = F(lexer);
+        return T1(lexer, val);
+    }
+}
+
+int E1(LexerPtr lexer, int input) {
+    if (lexer->token()->name() == "+") {
+        do {
+        lexer->next();
+        } while(lexer->token()->id() == 2);
+        int val = T(lexer);
+        return input + E1(lexer, val);
+    } else {
+        return input;
+    }
+}
+
+
+
+int E(LexerPtr lexer) {
+    if (lexer->token()->name() == "id") {
+        int val = T(lexer);
+        return E1(lexer, val);
+    }
+
+    return 0;
+}
+
 using namespace log;
 void MainWindow::on_pushButton_clicked() {
 
@@ -55,7 +112,10 @@ void MainWindow::on_pushButton_clicked() {
     lexer->addTerminal("", ++id, "[-*/+()]+");
     lexer->addTerminal("NAME", ++id, "[_a-zA-Z][_a-zA-Z0-9]*");
 
-    lexer->setSource("1 + 2 * 3");
+    lexer->setSource("1 * 2 + 3");
+
+    lexer->next();
+    int result = E(lexer);
 
     /*
     while (lexer->next()) {
@@ -129,7 +189,7 @@ void MainWindow::on_pushButton_clicked() {
     grammar->add(newProduction("B", "c"));
     grammar->add(newProduction("C", "B A"));
 */
-    grammar->add(newProduction("E", "T E1"));
+    grammar->add(newProduction("E", "T E1", [&](){return 1;}));
     grammar->add(newProduction("E1", "+ T E1"));
     grammar->add(newProduction("E1", "e"));
     grammar->add(newProduction("T", "F T1"));
