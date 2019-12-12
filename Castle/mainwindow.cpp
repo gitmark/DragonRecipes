@@ -39,6 +39,98 @@ int MainWindow::init(const std::string &filename) {
     return 0;
 }
 
+int F(LexerPtr lexer);
+int A2(LexerPtr lexer, int a, int b);
+int M2(LexerPtr lexer, int a, int b);
+int X(LexerPtr lexer);
+
+int A2(LexerPtr lexer, int a, int b) {
+    if (lexer->token()->name() == ")") {
+        do {
+            lexer->next();
+        } while(lexer->token()->id() == 2);
+
+        return a+b;
+    } else if (lexer->token()->name() == "+") {
+        do {
+            lexer->next();
+        } while(lexer->token()->id() == 2);
+
+        int val = F(lexer);
+        return A2(lexer, a+b, val);
+    } else if (lexer->token()->name() == "*") {
+        do {
+            lexer->next();
+        } while(lexer->token()->id() == 2);
+
+        int val = F(lexer);
+        return a + M2(lexer, b, val);
+    }
+    else {
+        return a+b;
+    }
+}
+
+int M2(LexerPtr lexer, int a, int b) {
+    if (lexer->token()->name() == ")") {
+        do {
+            lexer->next();
+        } while(lexer->token()->id() == 2);
+
+        return a*b;
+    } else if (lexer->token()->name() == "+") {
+        do {
+            lexer->next();
+        } while(lexer->token()->id() == 2);
+
+        int val = F(lexer);
+        return A2(lexer, a*b, val);
+    } else if (lexer->token()->name() == "*") {
+            do {
+                lexer->next();
+            } while(lexer->token()->id() == 2);
+
+            int val = F(lexer);
+            return M2(lexer, a*b, val);
+        }
+
+    else {
+        return a*b;
+    }
+}
+
+int N(LexerPtr lexer, int input) {
+    if (lexer->token()->name() == ")") {
+        do {
+            lexer->next();
+        } while(lexer->token()->id() == 2);
+
+        return input;
+    } if (lexer->token()->name() == "*") {
+        do {
+            lexer->next();
+        } while(lexer->token()->id() == 2);
+
+        int val = F(lexer);
+        return M2(lexer, input, val);
+    } else if (lexer->token()->name() == "+") {
+        do {
+            lexer->next();
+        } while(lexer->token()->id() == 2);
+
+        int val = F(lexer);
+        return A2(lexer, input, val);
+    } else {
+        return input;
+    }
+}
+
+int X(LexerPtr lexer) {
+    int val = F(lexer);
+    return N(lexer, val);
+}
+
+
 int F(LexerPtr lexer) {
     if (lexer->token()->name() == "id") {
         TokenPtr tok = lexer->token();
@@ -48,6 +140,13 @@ int F(LexerPtr lexer) {
 
         int val = std::atoi(tok->lexeme().c_str());
         return val;
+    } else if (lexer->token()->name() == "(") {
+        TokenPtr tok = lexer->token();
+        do {
+            lexer->next();
+        } while(lexer->token()->id() == 2);
+
+        return X(lexer);
     }
 
     return 0;
@@ -71,6 +170,8 @@ int T(LexerPtr lexer) {
         int val = F(lexer);
         return T1(lexer, val);
     }
+
+    return 0;
 }
 
 int E1(LexerPtr lexer, int input) {
@@ -112,10 +213,10 @@ void MainWindow::on_pushButton_clicked() {
     lexer->addTerminal("", ++id, "[-*/+()]+");
     lexer->addTerminal("NAME", ++id, "[_a-zA-Z][_a-zA-Z0-9]*");
 
-    lexer->setSource("1 * 2 + 3");
+    lexer->setSource("(1+2) * 3");
 
     lexer->next();
-    int result = E(lexer);
+    int result = X(lexer);
 
     /*
     while (lexer->next()) {
