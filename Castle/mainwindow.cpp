@@ -18,6 +18,7 @@
 #include <DragonRecipes/Log.h>
 #include <DragonRecipes/Error.h>
 #include <DragonRecipes/Lexer.h>
+#include <DragonRecipes/Node.h>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -39,162 +40,255 @@ int MainWindow::init(const std::string &filename) {
     return 0;
 }
 
-int F(LexerPtr lexer);
-int A2(LexerPtr lexer, int a, int b);
-int M2(LexerPtr lexer, int a, int b);
-int X(LexerPtr lexer);
+int tree_depth(NodePtr &n, int &depth, int y = 1)
+{
+    if (y > depth)
+        depth = y;
 
-int A2(LexerPtr lexer, int a, int b) {
-    if (lexer->token()->name() == ")") {
-        do {
-            lexer->next();
-        } while(lexer->token()->id() == 2);
-
-        return a+b;
-    } else if (lexer->token()->name() == "+") {
-        do {
-            lexer->next();
-        } while(lexer->token()->id() == 2);
-
-        int val = F(lexer);
-        return A2(lexer, a+b, val);
-    } else if (lexer->token()->name() == "*") {
-        do {
-            lexer->next();
-        } while(lexer->token()->id() == 2);
-
-        int val = F(lexer);
-        return a + M2(lexer, b, val);
+    for (auto &c : n->children())
+    {
+        tree_depth(c, depth, y + 1);
     }
-    else {
-        return a+b;
-    }
+
+    return depth;
 }
 
-int M2(LexerPtr lexer, int a, int b) {
-    if (lexer->token()->name() == ")") {
-        do {
-            lexer->next();
-        } while(lexer->token()->id() == 2);
+#define COL_WIDTH 5
+int print_at_depth(std::ostream &os, NodePtr &n, int depth, int radius, int y, int x, int &last_x, bool compact = true)
+{
+    if (y == depth)
+    {
+        os << std::string(static_cast<size_t>(x - last_x), ' ');
 
-        return a*b;
-    } else if (lexer->token()->name() == "+") {
-        do {
-            lexer->next();
-        } while(lexer->token()->id() == 2);
-
-        int val = F(lexer);
-        return A2(lexer, a*b, val);
-    } else if (lexer->token()->name() == "*") {
-            do {
-                lexer->next();
-            } while(lexer->token()->id() == 2);
-
-            int val = F(lexer);
-            return M2(lexer, a*b, val);
+        int size = 0;
+        if (n->children().empty()) {
+            TokenPtr token = std::static_pointer_cast<Token>(n->symbol());
+            if (token) {
+                os << token->lexeme();
+                size = static_cast<int>(token->lexeme().size());
+            } else {
+                os << "?";
+                size = 1;
+            }
+        } else {
+            os << n->symbol()->name();
+            size = static_cast<int>(n->symbol()->name().size());
         }
 
-    else {
-        return a*b;
+        last_x = x + size;
+        return 0;
     }
-}
 
-int N(LexerPtr lexer, int input) {
-    if (lexer->token()->name() == ")") {
-        do {
-            lexer->next();
-        } while(lexer->token()->id() == 2);
-
-        return input;
-    } if (lexer->token()->name() == "*") {
-        do {
-            lexer->next();
-        } while(lexer->token()->id() == 2);
-
-        int val = F(lexer);
-        return M2(lexer, input, val);
-    } else if (lexer->token()->name() == "+") {
-        do {
-            lexer->next();
-        } while(lexer->token()->id() == 2);
-
-        int val = F(lexer);
-        return A2(lexer, input, val);
-    } else {
-        return input;
-    }
-}
-
-int X(LexerPtr lexer) {
-    int val = F(lexer);
-    return N(lexer, val);
-}
-
-
-int F(LexerPtr lexer) {
-    if (lexer->token()->name() == "id") {
-        TokenPtr tok = lexer->token();
-        do {
-            lexer->next();
-        } while(lexer->token()->id() == 2);
-
-        int val = std::atoi(tok->lexeme().c_str());
-        return val;
-    } else if (lexer->token()->name() == "(") {
-        TokenPtr tok = lexer->token();
-        do {
-            lexer->next();
-        } while(lexer->token()->id() == 2);
-
-        return X(lexer);
+    int x_delta = -radius;
+    for (auto &c : n->children())
+    {
+        if (compact)
+            print_at_depth(os, c, depth, radius, y + 1, x + x_delta, last_x, compact);
+        else
+            print_at_depth(os, c, depth, radius/2, y + 1, x + x_delta, last_x, compact);
+        x_delta += 2*radius;
     }
 
     return 0;
 }
 
-int T1(LexerPtr lexer, int input) {
-    if (lexer->token()->name() == "*") {
-        do {
+int print_edges_at_depth(std::ostream &os, NodePtr &n, int depth, int edge_radius, int radius, int y, int x, int &last_x, bool compact = true)
+{
+    if (y == depth)
+    {
+        x -= edge_radius;
+
+        size_t pad = 0;
+        if (x > last_x)
+            pad = static_cast<size_t>(x - last_x);
+        else
+            os.flush(); // << "error\n";
+
+        if (n->children().size() == 2)
+        {
+            os << std::string(pad, ' ');
+            os << "/" << std::string(static_cast<size_t>((edge_radius-1)*2 + 1), ' ') << "\\";
+        }
+        else if (n->children().size() == 1)
+        {
+            os << std::string(pad, ' ');
+            os << " | ";
+        }
+        else
+        {
+            os << std::string(pad, ' ');
+            os << "   ";
+        }
+
+        last_x = x + 3;
+        return 0;
+    }
+
+    int x_delta = -radius;
+    for (auto &c : n->children())
+    {
+        if (compact)
+            print_edges_at_depth(os, c, depth, edge_radius, radius, y + 1, x + x_delta, last_x, compact);
+        else
+            print_edges_at_depth(os, c, depth, edge_radius, radius/2, y + 1, x + x_delta, last_x, compact);
+        x_delta += 2*radius;
+    }
+
+    return 0;
+}
+
+int print_tree(std::ostream &os, NodePtr &n, bool compact = true)
+{
+    int depth = 0;
+    tree_depth(n, depth);
+
+    int x_offset = 50;
+    int radius = 1 << (depth - 1);
+    if(compact)
+        radius = 2;
+    for (int i = 0; i < depth; ++i)
+    {
+        int last_x = 0;
+        print_at_depth(os, n, i, radius, 0, x_offset, last_x, compact);
+        os << "\n";
+        int count = radius/(1<<(i));
+        if(compact)
+            count = 2;
+        for(int edge_radius = 1; edge_radius < count; ++edge_radius)
+        {
+            int last_edge_x = 0;
+            if(compact)
+                print_edges_at_depth(os, n, i, edge_radius, radius, 0, x_offset, last_edge_x, compact);
+            else
+                print_edges_at_depth(os, n, i, edge_radius, radius, 0, x_offset, last_edge_x, compact);
+            os << "\n";
+        }
+    }
+
+    return 0;
+}
+
+class Expression;
+class PrintStack {
+public:
+    PrintStack(Expression *exp, const std::string &scope);
+    virtual ~PrintStack();
+
+private:
+    Expression *exp;
+};
+
+using PS = PrintStack;
+
+class Expression {
+public:
+    Expression(std::ostream &os, LexerPtr lexer):
+        os(os), lexer(lexer) {}
+
+    NodePtr F() {
+        PS ps(this, "F");
+        if (lexer->token()->name() == "id") {
+            TokenPtr tok = lexer->token();
             lexer->next();
-        } while(lexer->token()->id() == 2);
+            return newNode(tok);
+        } else if (lexer->token()->name() == "(") {
+            TokenPtr tok = lexer->token();
+            lexer->next();
+            NodePtr exp = E();
+            lexer->next();
+            return exp;
+        }
 
-        int val = F(lexer);
-        return input * T1(lexer, val);
-    } else {
-        return input;
+        return nullptr;
     }
+
+    // Maybe a * expression
+    NodePtr T1(NodePtr input) {
+        PS ps(this, "T1");
+
+        if (lexer->token()->name() == "*") {
+            NodePtr mult = newNode(newToken(lexer->token()->name(), lexer->token()->id(), lexer->token()->lexeme()));
+            lexer->next();
+            mult->addChild(input);
+            mult->addChild(F());
+            return T1(mult);
+        } else {
+            return input;
+        }
+    }
+
+    // Returns a value
+    NodePtr T() {
+        PS ps(this, "T");
+        return T1(F()); // Maybe a mult expression
+    }
+
+    // Maybe a + expression
+    NodePtr E1(NodePtr input) {
+        PS ps(this, "E1");
+
+        if (lexer->token()->name() == "+") {
+            NodePtr plus = newNode(newToken(lexer->token()->name(), lexer->token()->id(), lexer->token()->lexeme()));
+            lexer->next();
+            plus->addChild(input);
+            plus->addChild(T());
+            return E1(plus);
+        } else {
+            return input;
+        }
+    }
+
+    NodePtr E() {
+        PS ps(this, "E");
+
+        if (lexer->token()->name() == "id") {
+            return E1(T());
+        }
+
+        return nullptr;
+    }
+
+    void printStack(const std::string &postfix) {
+        bool first = true;
+
+        std::stringstream ss;
+        for (auto s : stack) {
+            if (first)
+                first = false;
+            else
+                ss << " ";
+
+            ss << s;
+        }
+
+        os << std::setw(20) << std::right << ss.str() << postfix;
+        os << "\n";
+    }
+
+    void pushScope(const std::string &scope) {
+        stack.push_front(scope);
+    }
+
+    void popScope() {
+        stack.pop_front();
+    }
+
+private:
+    std::ostream &os;
+    LexerPtr lexer;
+    std::deque<std::string> stack;
+};
+
+
+PrintStack::PrintStack(Expression *exp, const std::string &scope) :
+    exp(exp) {
+    exp->pushScope(scope);
+    exp->printStack(" {");
 }
 
-int T(LexerPtr lexer) {
-    if (lexer->token()->name() == "id") {
-        int val = F(lexer);
-        return T1(lexer, val);
-    }
-
-    return 0;
-}
-
-int E1(LexerPtr lexer, int input) {
-    if (lexer->token()->name() == "+") {
-        do {
-        lexer->next();
-        } while(lexer->token()->id() == 2);
-        int val = T(lexer);
-        return input + E1(lexer, val);
-    } else {
-        return input;
-    }
-}
-
-
-
-int E(LexerPtr lexer) {
-    if (lexer->token()->name() == "id") {
-        int val = T(lexer);
-        return E1(lexer, val);
-    }
-
-    return 0;
+PrintStack::~PrintStack() {
+    exp->printStack(" }");
+    exp->popScope();
 }
 
 using namespace log;
@@ -204,26 +298,20 @@ void MainWindow::on_pushButton_clicked() {
         ui->textEditLog->setText(ui->textEditLog->toPlainText() + str.c_str());
     }));
 
-
     LexerPtr lexer = newLexer();
 
     int id = 0;
     lexer->addTerminal("id", ++id, "[0-9]+");
     lexer->addTerminal("S", ++id, "[ \t]+");
-    lexer->addTerminal("", ++id, "[-*/+()]+");
+    lexer->addTerminal("", ++id, "[-*/+()]");
     lexer->addTerminal("NAME", ++id, "[_a-zA-Z][_a-zA-Z0-9]*");
 
-    lexer->setSource("(1+2) * 3");
+    lexer->setSource("1 + ( 2 + 3 )");
 
     lexer->next();
-    int result = X(lexer);
-
-    /*
-    while (lexer->next()) {
-        TokenPtr token = lexer->token();
-        error << token->name() << ", " << token->id() << "\n";
-    }
-*/
+    Expression exp(error, lexer);
+    NodePtr result = exp.E();
+    print_tree(error, result);
 
     std::string text;
     if (!_filename.empty()) {

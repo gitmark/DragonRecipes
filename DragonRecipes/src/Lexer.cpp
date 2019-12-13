@@ -147,31 +147,42 @@ Lexer::Lexer () :
 
         if (!data->regexCompiled)
             compileRegex();
+
         data->token = newToken("$");
         std::smatch m;
-        if (std::regex_search(data->remaining, m, data->re)) {
-            //    if(m.prefix.)
-            int i = 0;
-            for(auto item :m) {
-                if ((i > 1) && item.matched) {
-                    unsigned long len = static_cast<unsigned long>(item.length());
-                    data->pos += len;
-                    std::string lexeme = data->remaining.substr(0, len);
-                    data->remaining = data->remaining.substr(len);
-                    int id = data->groupNumToId[i];
-                    std::string symbol = data->idToSymbol[id];
-                    if (symbol.empty())
-                        symbol = lexeme;
-                    data->token = newToken(symbol, id, lexeme, 0, 0);
-                    return true;
+        bool found = false;
+        bool done = false;
+        while(!done) {
+            found = false;
+            if (std::regex_search(data->remaining, m, data->re)) {
+                //    if(m.prefix.)
+                int i = 0;
+                for(auto item :m) {
+                    if ((i > 1) && item.matched) {
+                        unsigned long len = static_cast<unsigned long>(item.length());
+                        data->pos += len;
+                        std::string lexeme = data->remaining.substr(0, len);
+                        data->remaining = data->remaining.substr(len);
+                        int id = data->groupNumToId[i];
+                        std::string symbol = data->idToSymbol[id];
+                        if (symbol.empty())
+                            symbol = lexeme;
+                        data->token = newToken(symbol, id, lexeme, 0, 0);
+                        found = true;
+                        // If whitespace, keep looking
+                        if (data->token->id() != 2) {
+                            done = true;
+                        }
+                    }
+                    ++i;
                 }
-                ++i;
             }
 
-            return false;
-        } else {
-            return false;
+            if (!found)
+                done = true;
         }
+
+        return found;
     }
 
     void Lexer::reset() {
