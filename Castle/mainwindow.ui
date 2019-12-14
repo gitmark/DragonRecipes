@@ -82,6 +82,16 @@
       </item>
      </layout>
     </item>
+    <item>
+     <widget class="TreeGrid" name="treeGrid" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>300</width>
+        <height>200</height>
+       </size>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -96,6 +106,14 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TreeGrid</class>
+   <extends>QWidget</extends>
+   <header>TreeGrid.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

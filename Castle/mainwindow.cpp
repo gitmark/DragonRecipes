@@ -279,7 +279,6 @@ private:
     std::deque<std::string> stack;
 };
 
-
 PrintStack::PrintStack(Expression *exp, const std::string &scope) :
     exp(exp) {
     exp->pushScope(scope);
@@ -306,12 +305,12 @@ void MainWindow::on_pushButton_clicked() {
     lexer->addTerminal("", ++id, "[-*/+()]");
     lexer->addTerminal("NAME", ++id, "[_a-zA-Z][_a-zA-Z0-9]*");
 
-    lexer->setSource("1 + ( 2 + 3 )");
+    lexer->setSource("1 * 2 + 3 * 4");
 
     lexer->next();
     Expression exp(error, lexer);
     NodePtr result = exp.E();
-    print_tree(error, result);
+    print_tree(error, result, false);
 
     std::string text;
     if (!_filename.empty()) {
@@ -321,24 +320,8 @@ void MainWindow::on_pushButton_clicked() {
         text = buffer.str();
     }
 
-//    log::info << text;
-//    log::info.flush();
-
     std::vector<SymbolPtr> terminals;
     std::vector<SymbolPtr> nonterminals;
-
-    /*
-    terminals.push_back(newTerm("a", 1));
-    terminals.push_back(newTerm("b", 2));
-    terminals.push_back(newTerm("c", 3));
-
-    nonterminals.push_back(newNonterm("A", 101));
-    nonterminals.push_back(newNonterm("B", 102));
-    nonterminals.push_back(newNonterm("C", 103));
-    */
-
-//    std::vector<std::string> terminals = {"id", "+", "*", "(", ")", "$"};
-//    std::vector<std::string> nonterminals = {"E", "E1", "T", "T1", "F"};
 
     terminals.push_back(newTerm("id", 1));
     terminals.push_back(newTerm("+", 2));
@@ -372,12 +355,6 @@ void MainWindow::on_pushButton_clicked() {
         return;
     }
 
-    /*
-    grammar->add(newProduction("A", "a A"));
-    grammar->add(newProduction("A", "b A"));
-    grammar->add(newProduction("B", "c"));
-    grammar->add(newProduction("C", "B A"));
-*/
     grammar->add(newProduction("E", "T E1", [&](){return 1;}));
     grammar->add(newProduction("E1", "+ T E1"));
     grammar->add(newProduction("E1", "e"));
