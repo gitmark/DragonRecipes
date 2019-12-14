@@ -168,7 +168,7 @@ public:
             Size leftSize = left->size();
             Size rightSize = right->size();
 
-            if (leftSize.width > rightSize.height*0.8) {
+            if (leftSize.width > rightSize.height*0.95) {
 
             left->setParentEdge(Vec(0, 1 + rightSize.height));
             right->setParentEdge(Vec(2, 0));

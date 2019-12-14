@@ -7,12 +7,14 @@
 #include <iostream>
 #include "DragonRecipes/Production.h"
 #include "DragonRecipes/StringTools.h"
+#include "DragonRecipes/Node.h"
+#include "DragonRecipes/Token.h"
 
 namespace dragon {
 
 class ProductionPrivate {
   public:
-    ProductionPrivate(std::string head, const std::string &body, std::function<int()> action) :
+    ProductionPrivate(std::string head, const std::string &body, std::function<int(std::vector<NodePtr>&,TokenPtr)> action) :
           head(std::move(head)), action(action) {
         split(body, " ", this->body);
     }
@@ -20,17 +22,20 @@ class ProductionPrivate {
 private:
     std::string head;
     std::vector<std::string> body;
-    std::function<int()> action;
+    std::function<int(std::vector<NodePtr>&,TokenPtr)> action;
     friend class Production;
 };
 
-Production::Production(const std::string &head, const std::string &body, std::function<int()> action) :
+Production::Production(const std::string &head, const std::string &body, std::function<int(std::vector<NodePtr>&,TokenPtr)> action) :
     data(new ProductionPrivate(head, body, action)) {}
 
 Production::~Production() {
     data.reset(nullptr);
 }
 
+int Production::action(std::vector<NodePtr> &node, TokenPtr token) {
+    return data->action(node,token);
+}
 std::vector<std::string> Production::bodyVec() {
     return data->body;
 }

@@ -15,6 +15,7 @@
 #include <DragonRecipes/Token.h>
 #include <DragonRecipes/Log.h>
 #include <DragonRecipes/Lexer.h>
+#include <DragonRecipes/Node.h>
 
 //using namespace std;
 
@@ -513,8 +514,10 @@ void Grammar::clearLastError() {
     data->lastError = nullptr;
 }
 
-int Grammar::runPredictiveParser(std::ostream &os, LexerPtr lex) {
+NodePtr Grammar::runPredictiveParser(std::ostream &os, LexerPtr lex) {
 
+
+    std::vector<NodePtr> nodes;
     int ws = 2;
     std::deque<std::string> stack;
     stack.push_front("$");
@@ -565,20 +568,27 @@ int Grammar::runPredictiveParser(std::ostream &os, LexerPtr lex) {
             split(body, " ", parts);
             stack.pop_front();
             for (int i = (int)parts.size() -1; i >= 0; --i) {
-                if (parts[i] == "e")
+                if (parts[i] == "e") {
+                    os << "e\n";
+                    prod->print(os);
                     continue;
+                }
 
                 stack.push_front(parts[i]);
             }
+            prod->action(nodes, tok);
         } else {
             os << "SYNTAX ERROR\n";
-            return 1;
+            return nullptr;
         }
 
 //        os << "body: " << body << "\n";
     }
 
-    return 0;
+    if (nodes.size() != 1)
+        return nullptr;
+
+    return nodes.back();
 }
 
 }

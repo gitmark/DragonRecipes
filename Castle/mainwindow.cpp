@@ -305,13 +305,14 @@ void MainWindow::on_pushButton_clicked() {
     lexer->addTerminal("", ++id, "[-*/+()]");
     lexer->addTerminal("NAME", ++id, "[_a-zA-Z][_a-zA-Z0-9]*");
 
-    lexer->setSource("1 + 2 * 3 * 4 * 5 + 2 * 3 * 4 * 5 + 2 * 3 * 4 * 5 * 6 * 7 * 8");
-//    lexer->setSource(ui->lineEditHead->text().toStdString());
+    lexer->setSource("(1 + 2) * 3");
 
-    lexer->next();
-    Expression exp(error, lexer);
-    NodePtr result = exp.E();
-    ui->treeGrid->addTree(result);
+    //    lexer->setSource(ui->lineEditHead->text().toStdString());
+
+//    lexer->next();
+//    Expression exp(error, lexer);
+//    NodePtr result = exp.E();
+//    ui->treeGrid->addTree(result);
 //    print_tree(error, result, false);
 
     std::string text;
@@ -357,14 +358,72 @@ void MainWindow::on_pushButton_clicked() {
         return;
     }
 
-    grammar->add(newProduction("E", "T E1", [&](){return 1;}));
-    grammar->add(newProduction("E1", "+ T E1"));
+    grammar->add(newProduction("E", "T E1", [](std::vector<NodePtr> &nodes,TokenPtr token){ return 0;}));
+
+    grammar->add(newProduction("E1", "+ T E1",
+[](std::vector<NodePtr> &nodes,TokenPtr token){
+                                   nodes.push_back(newNode(token));
+return 0;}));
     grammar->add(newProduction("E1", "e"));
     grammar->add(newProduction("T", "F T1"));
-    grammar->add(newProduction("T1", "* F T1"));
-    grammar->add(newProduction("T1", "e"));
+    grammar->add(newProduction("T1", "* F T1",
+                               [](std::vector<NodePtr> &nodes,TokenPtr token){
+                                   nodes.push_back(newNode(token));
+                                   return 0;}));
+
+    grammar->add(newProduction("T1", "e",
+[](std::vector<NodePtr> &nodes,TokenPtr token){
+
+                                   if (nodes.size() < 3) {
+                                       return 0;
+                                   }
+
+                                   TokenPtr t = std::dynamic_pointer_cast<Token>(nodes[nodes.size() - 2]->symbol());
+                                   if (!t || t->lexeme() != "+") {
+                                       return 0;
+                                   }
+
+                                   NodePtr right = nodes.back();
+                                   nodes.pop_back();
+
+                                   NodePtr op = nodes.back();
+                                   nodes.pop_back();
+
+                                   NodePtr left = nodes.back();
+                                   nodes.pop_back();
+
+                                   op->addChild(left);
+                                   op->addChild(right);
+                                   nodes.push_back(op);
+
+return 0;}));
     grammar->add(newProduction("F", "( E )"));
-    grammar->add(newProduction("F", "id"));
+    grammar->add(newProduction("F", "id",
+                                            [](std::vector<NodePtr> &nodes,TokenPtr token){
+
+                                   NodePtr right = newNode(token);
+                                   if (nodes.size() < 2) {
+                                       nodes.push_back(right);
+                                       return 0;
+                                   }
+
+                                   TokenPtr t = std::dynamic_pointer_cast<Token>(nodes.back()->symbol());
+                                   if (!t || t->lexeme() != "*") {
+                                       nodes.push_back(right);
+                                       return 0;
+                                   }
+
+                                   NodePtr op = nodes.back();
+                                   nodes.pop_back();
+
+                                   NodePtr left = nodes.back();
+                                   nodes.pop_back();
+
+                                   op->addChild(left);
+                                   op->addChild(right);
+                                   nodes.push_back(op);
+
+return 0;}));
     grammar->setStartSymbol("E");
     rc = grammar->buildTables();
 
@@ -391,7 +450,8 @@ void MainWindow::on_pushButton_clicked() {
 
     ui->textEditLog->setFont (QFont ("Courier", 13));
 
-    grammar->runPredictiveParser(error,lexer);
+    NodePtr n = grammar->runPredictiveParser(error,lexer);
+    ui->treeGrid->addTree(n);
 }
 
 }

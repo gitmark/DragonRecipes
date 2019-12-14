@@ -69,7 +69,7 @@ class DRAGON_EXPORT Grammar {
     ErrorPtr lastError();
     void clearLastError();
 
-    int runPredictiveParser(std::ostream &os, LexerPtr lex);
+    NodePtr runPredictiveParser(std::ostream &os, LexerPtr lex);
 
   private:
       std::unique_ptr<GrammarPrivate> data;

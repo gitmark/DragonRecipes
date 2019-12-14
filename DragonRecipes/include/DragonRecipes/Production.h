@@ -10,6 +10,8 @@
 #include <string>
 #include <memory>
 #include <DragonRecipes/Constants.h>
+#include <DragonRecipes/Node.h>
+#include <DragonRecipes/Token.h>
 
 namespace dragon {
 
@@ -17,7 +19,7 @@ class ProductionPrivate;
 
 class DRAGON_EXPORT Production {
   public:
-    Production(const std::string &head, const std::string &body, std::function<int()> action = [](){return 0;});
+    Production(const std::string &head, const std::string &body, std::function<int(std::vector<NodePtr>&,TokenPtr)> action = [](std::vector<NodePtr>&,TokenPtr){return 0;});
     Production(const Production&) = delete;
     Production(Production&&) = delete;
     Production &operator=(const Production &production) = delete;
@@ -30,6 +32,7 @@ class DRAGON_EXPORT Production {
     std::string head();
     void print(std::ostream &os);
     std::string toString();
+    int action(std::vector<NodePtr>&,TokenPtr);
 
   private:
       std::unique_ptr<ProductionPrivate> data;
@@ -37,7 +40,7 @@ class DRAGON_EXPORT Production {
 
 using ProdPtr = std::shared_ptr<Production>;
 
-inline ProdPtr newProduction(const std::string &head, const std::string &body, std::function<int()> action = [](){return 0;}) {
+inline ProdPtr newProduction(const std::string &head, const std::string &body, std::function<int(std::vector<NodePtr>&,TokenPtr)> action = [](std::vector<NodePtr>&,TokenPtr){return 0;}) {
     return std::make_shared<Production>(head, body, action);
 }
 }
