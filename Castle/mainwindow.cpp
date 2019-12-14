@@ -305,12 +305,14 @@ void MainWindow::on_pushButton_clicked() {
     lexer->addTerminal("", ++id, "[-*/+()]");
     lexer->addTerminal("NAME", ++id, "[_a-zA-Z][_a-zA-Z0-9]*");
 
-    lexer->setSource("1 * 2 + 3 * 4");
+    lexer->setSource("1 + 2 * 3 * 4 * 5 + 2 * 3 * 4 * 5 + 2 * 3 * 4 * 5 * 6 * 7 * 8");
+//    lexer->setSource(ui->lineEditHead->text().toStdString());
 
     lexer->next();
     Expression exp(error, lexer);
     NodePtr result = exp.E();
-    print_tree(error, result, false);
+    ui->treeGrid->addTree(result);
+//    print_tree(error, result, false);
 
     std::string text;
     if (!_filename.empty()) {

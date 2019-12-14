@@ -23,6 +23,11 @@ TreeGrid::TreeGrid(QWidget *parent) : QWidget(parent)
         grid[i].resize(width);
 }
 
+void TreeGrid::addTree(NodePtr node) {
+    trees.push_back(newNodeDim(node));
+    repaint();
+}
+
 void TreeGrid::addToGrid(int row, int col, SymbolPtr symbol) {
     TokenPtr token = std::dynamic_pointer_cast<Token>(symbol);
     if (token) {
@@ -62,7 +67,7 @@ void TreeGrid::addToGrid(int row, int col, NodeDimPtr nodeDim) {
 
 void TreeGrid::paintEvent(QPaintEvent *)
 {
-
+/*
     NodePtr n1 = newNode(newToken("",1,"*"));
     n1->addChild(newNode(newToken("N",2, "1")));
     n1->addChild(newNode(newToken("N",2, "2")));
@@ -74,10 +79,13 @@ void TreeGrid::paintEvent(QPaintEvent *)
     NodePtr n3 = newNode(newToken("",1,"+"));
     n3->addChild(n1);
     n3->addChild(n2);
+*/
+    if(trees.empty())
+        return;
 
-    NodeDimPtr nodeDim = newNodeDim(n3);
+    NodeDimPtr nodeDim = trees.back(); //newNodeDim(n3);
 
-    addToGrid(0,0,n3);
+//    addToGrid(0,0,n3);
 
     QPainter painter(this);
 
@@ -101,6 +109,7 @@ void TreeGrid::paintEvent(QPaintEvent *)
 
     nodeDim->paint(painter, Point(20.5*scale, 1.5*scale), Point(20, 1), scale, fontSize);
 
+    /*
     // Draw cells
     for(size_t row = 0; row <= height; ++row) {
         for(size_t col = 0; col <= width; ++col) {
@@ -122,4 +131,5 @@ void TreeGrid::paintEvent(QPaintEvent *)
             painter.drawLine(col*scale, 0, col*scale, height*scale);
         }
     }
+*/
 }

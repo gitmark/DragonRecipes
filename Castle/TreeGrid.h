@@ -168,6 +168,8 @@ public:
             Size leftSize = left->size();
             Size rightSize = right->size();
 
+            if (leftSize.width > rightSize.height*0.8) {
+
             left->setParentEdge(Vec(0, 1 + rightSize.height));
             right->setParentEdge(Vec(2, 0));
 
@@ -175,6 +177,15 @@ public:
             int newHeight = leftSize.height + rightSize.height + 1;
 
             _size = Size(newWidth, newHeight);
+            } else {
+                left->setParentEdge(Vec(0, 2));
+                right->setParentEdge(Vec(1 + leftSize.width, 0));
+
+                int newHeight = std::max(leftSize.height, 2 + rightSize.height);
+                int newWidth = leftSize.width + rightSize.width + 1;
+
+                _size = Size(newWidth, newHeight);
+            }
             return _size;
 
         } else if (_children.size() == 1) {
@@ -242,6 +253,7 @@ public:
     void addToGrid(int row, int col, NodePtr node);
     void addToGrid(int row, int col, SymbolPtr symbol);
     void addToGrid(int row, int col, NodeDimPtr nodeDim);
+    void addTree(NodePtr node);
 
 protected:
     void paintEvent(QPaintEvent * /* event */);
@@ -253,6 +265,7 @@ private:
     size_t width{10};
     size_t height{10};
     std::vector<std::vector<Cell>> grid;
+    std::vector<NodeDimPtr> trees;
 };
 
 #endif
