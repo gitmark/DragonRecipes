@@ -80,6 +80,8 @@ void TreeGrid::paintEvent(QPaintEvent *)
     addToGrid(0,0,n3);
 
     QPainter painter(this);
+
+    painter.setRenderHint( QPainter::Antialiasing );
     painter.setBrush(QBrush(QColor(0,200,200)));
 
     QSize s = this->geometry().size();
@@ -95,9 +97,9 @@ void TreeGrid::paintEvent(QPaintEvent *)
     int pointSize = 12;
     painter.setFont(QFont("Courier", pointSize));
     float scale = 20.0f;
-    float fontSize = pointSize/2;
+    float fontSize = pointSize/1.7f;
 
-    nodeDim->paint(painter, 20, 1, scale, fontSize);
+    nodeDim->paint(painter, Point(20.5*scale, 1.5*scale), Point(20, 1), scale, fontSize);
 
     // Draw cells
     for(size_t row = 0; row <= height; ++row) {

@@ -6,6 +6,9 @@
 #ifndef TREE_GRID_H
 #define TREE_GRID_H
 
+#define _USE_MATH_DEFINES
+
+#include <cmath>
 #include <QWidget>
 #include <QPainter>
 #include <DragonRecipes/Node.h>
@@ -13,6 +16,44 @@
 #include <DragonRecipes/Token.h>
 
 using namespace dragon;
+
+class Point {
+public:
+    Point(float x = 0, float y = 0) : x(x), y(y) {}
+    float x;
+    float y;
+};
+
+inline Point rotate(Point center, float angle, Point point) {
+
+    float x = 0;
+    float y = 0;
+
+    float x1 = point.x - center.x;
+    float y1 = point.y - center.y;
+
+    float c = std::cos(-angle);
+    float s = std::sin(-angle);
+    x = c*x1 - s*y1;
+    y = s*x1 + c*y1;
+
+    return Point(center.x + x, center.y + y);
+}
+
+inline Point scale(Point center, float s, Point point) {
+
+    float x = 0;
+    float y = 0;
+
+    float x1 = point.x - center.x;
+    float y1 = point.y - center.y;
+
+    x = s*x1;
+    y = s*y1;
+
+    return Point(center.x + x, center.y + y);
+}
+
 
 class Vec {
 public:
@@ -46,7 +87,44 @@ public:
 
     virtual ~NodeDim();
 
-    void paint(QPainter &painter, int x, int y, float scale, float fontSize) {
+    int toInt(double d) {
+        return static_cast<int>(rint(d));
+    }
+
+    int toInt(float f) {
+        return static_cast<int>(rint(f));
+    }
+
+    void drawLine(float x1, float y1, float x2, float y2) {
+        Point p1(x1,y1);
+        Point p2(x2,y2);
+
+        Point p3 = rotate(_center, _angle, p1);
+        Point p4 = rotate(_center, _angle, p2);
+        _painter->drawLine(toInt(p3.x), toInt(p3.y), toInt(p4.x), toInt(p4.y));
+    }
+
+    void drawText(const Point &point, const std::string &text) {
+//        Point p1(point.x*_scale + (_scale - _fontSize)/2, point.y*_scale + (_fontSize + _scale)/2);
+        Point p1(point.x*_scale, point.y*_scale);
+        Point p3 = rotate(_center, _angle, p1);
+        _painter->setBrush(QBrush(QColor(0,0,0)));
+        _painter->setPen(QColor(0,0,0));
+        float eScale = 2.5f;
+        _painter->drawEllipse(toInt(p3.x - _fontSize*eScale/2), toInt(p3.y - _fontSize*eScale/2), toInt(_fontSize*eScale), toInt(_fontSize*eScale));
+        _painter->setPen(QColor(200,200,200));
+        _painter->drawText(toInt(p3.x - _fontSize/2), toInt(p3.y + _fontSize/2), text.c_str());
+    }
+
+    void paint(QPainter &painter, Point center, Point point, float scale, float fontSize) {
+        _painter = &painter;
+        _scale = scale;
+        _angle = -static_cast<float>(M_PI)/4.0f;
+        _center = center;
+        _fontSize = fontSize;
+
+        float x = point.x;
+        float y = point.y;
 
         TokenPtr token = std::dynamic_pointer_cast<Token>(node()->symbol());
         std::string str;
@@ -59,16 +137,17 @@ public:
             Vec edge = ch->parentEdge();
             float offset = 0.5;
             painter.setPen(QColor(200,200,200));
-            painter.drawLine((x + offset)*scale, (y + offset)*scale, (x+edge.x + offset)*scale, (y+edge.y + offset)*scale);
-            ch->paint(painter, x + edge.x, y + edge.y, scale, fontSize);
+//            drawLine((x + offset)*scale, (y + offset)*scale, (x+edge.x + offset)*scale, (y+edge.y + offset)*scale);
+            drawLine((x)*scale, (y)*scale, (x+edge.x)*scale, (y+edge.y)*scale);
+            ch->paint(painter, _center, Point((x + edge.x), (y + edge.y)), scale, fontSize);
         }
 
         painter.setBrush(QBrush(QColor(0,0,0)));
         painter.setPen(QColor(0,0,0));
-        painter.drawEllipse(x*scale, y*scale, scale, scale);
+//        painter.drawEllipse(toInt(x*scale), toInt(y*scale), toInt(scale), toInt(scale));
         painter.setPen(QColor(200,200,200));
         painter.setBrush(QBrush(QColor(200,200,200)));
-        painter.drawText(x*scale + (scale - fontSize)/2, y*scale + (fontSize + scale)/2, str.c_str());
+        drawText(point, str);
     }
 
     Vec parentEdge() {
@@ -134,6 +213,11 @@ private:
     Size _size;
     NodePtr _node;
     std::vector<NodeDimPtr> _children;
+    float _angle{-static_cast<float>(M_PI)/4.0f};
+    float _scale{20};
+    QPainter *_painter{nullptr};
+    Point _center;
+    float _fontSize{24};
 };
 
 inline NodeDimPtr newNodeDim(NodePtr node) {
