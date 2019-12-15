@@ -305,7 +305,7 @@ void MainWindow::on_pushButton_clicked() {
     lexer->addTerminal("", ++id, "[-*/+()]");
     lexer->addTerminal("NAME", ++id, "[_a-zA-Z][_a-zA-Z0-9]*");
 
-    lexer->setSource("(1 + 2) * 3");
+    lexer->setSource("1 + 2 * 3 * 4 + 5*6");
 
     //    lexer->setSource(ui->lineEditHead->text().toStdString());
 
@@ -364,7 +364,48 @@ void MainWindow::on_pushButton_clicked() {
 [](std::vector<NodePtr> &nodes,TokenPtr token){
                                    nodes.push_back(newNode(token));
 return 0;}));
-    grammar->add(newProduction("E1", "e"));
+    grammar->add(newProduction("E1", "e",
+[](std::vector<NodePtr> &nodes,TokenPtr token){
+
+                                   if (nodes.size() < 3) {
+                                       return 0;
+                                   }
+
+                                   TokenPtr t = std::dynamic_pointer_cast<Token>(nodes[nodes.size() - 2]->symbol());
+
+                                   if (t && t->lexeme() == "(" && token->lexeme() == ")") {
+                                       NodePtr n = nodes.back();
+                                       nodes.pop_back();
+                                       nodes.pop_back();
+                                       nodes.push_back(n);
+                                       return 0;
+                                   }
+                                   if (!t || t->lexeme() != "*") {
+                                       return 0;
+                                   }
+
+                                   NodePtr right = nodes.back();
+                                   nodes.pop_back();
+
+                                   NodePtr op = nodes.back();
+                                   nodes.pop_back();
+
+                                   NodePtr left = nodes.back();
+                                   nodes.pop_back();
+
+                                   op->addChild(left);
+                                   op->addChild(right);
+                                   /*
+                                   if (token->lexeme() == ")") {
+                                       TokenPtr t2 = std::dynamic_pointer_cast<Token>(nodes.back()->symbol());
+                                       if (t2 && t2->lexeme() == "(")
+                                          nodes.pop_back();
+                                   }
+*/
+                                   nodes.push_back(op);
+
+return 0;}));
+
     grammar->add(newProduction("T", "F T1"));
     grammar->add(newProduction("T1", "* F T1",
                                [](std::vector<NodePtr> &nodes,TokenPtr token){
@@ -374,11 +415,24 @@ return 0;}));
     grammar->add(newProduction("T1", "e",
 [](std::vector<NodePtr> &nodes,TokenPtr token){
 
-                                   if (nodes.size() < 3) {
+                                   if (nodes.size() < 2) {
                                        return 0;
                                    }
 
                                    TokenPtr t = std::dynamic_pointer_cast<Token>(nodes[nodes.size() - 2]->symbol());
+
+                                   if (t && t->lexeme() == "(" && token->lexeme() == ")") {
+                                       NodePtr n = nodes.back();
+                                       nodes.pop_back();
+                                       nodes.pop_back();
+                                       nodes.push_back(n);
+                                       return 0;
+                                   }
+
+                                   if (nodes.size() < 3) {
+                                       return 0;
+                                   }
+
                                    if (!t || t->lexeme() != "+") {
                                        return 0;
                                    }
@@ -394,10 +448,21 @@ return 0;}));
 
                                    op->addChild(left);
                                    op->addChild(right);
+                                   if (token->lexeme() == ")") {
+                                       TokenPtr t2 = std::dynamic_pointer_cast<Token>(nodes.back()->symbol());
+                                       if (t2 && t2->lexeme() == "(")
+                                          nodes.pop_back();
+                                   }
                                    nodes.push_back(op);
 
+
+
 return 0;}));
-    grammar->add(newProduction("F", "( E )"));
+    grammar->add(newProduction("F", "( E )",
+[](std::vector<NodePtr> &nodes,TokenPtr token){
+                                   nodes.push_back(newNode(token));
+return 0;}));
+
     grammar->add(newProduction("F", "id",
                                             [](std::vector<NodePtr> &nodes,TokenPtr token){
 
