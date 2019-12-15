@@ -42,6 +42,7 @@ class MainWindow : public QMainWindow {
 
   private:
     Ui::MainWindow *ui;
+    std::string textTree;
 };
 
 }

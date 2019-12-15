@@ -23,6 +23,11 @@ TreeGrid::TreeGrid(QWidget *parent) : QWidget(parent)
         grid[i].resize(width);
 }
 
+std::string TreeGrid::textTree() {
+    return _treeText;
+}
+
+
 void TreeGrid::addTree(NodePtr node) {
     trees.push_back(newNodeDim(node));
     repaint();
@@ -104,11 +109,11 @@ void TreeGrid::paintEvent(QPaintEvent *)
     painter.setBrush(QBrush(QColor(0,200,200)));
     int pointSize = 12;
     painter.setFont(QFont("Courier", pointSize));
-    float scale = 20.0f;
+    float scale = 10.0f;
     float fontSize = pointSize/1.7f;
 
-    nodeDim->paint(painter, Point(20.5*scale, 1.5*scale), Point(20, 1), scale, fontSize);
-
+    nodeDim->paint(painter, textCanvas, Point(20, 1), Point(20, 1), scale, fontSize);
+    _treeText = nodeDim->textTree();
     /*
     // Draw cells
     for(size_t row = 0; row <= height; ++row) {

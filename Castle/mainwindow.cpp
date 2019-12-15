@@ -300,13 +300,14 @@ void MainWindow::on_pushButton_clicked() {
         ui->textEditLog->setText(ui->textEditLog->toPlainText() + str.c_str());
     }));
 
+    /*
     TextCanvas canvas(10,10);
     canvas.drawLine(Point(1,1),Point(8,8));
-    canvas.drawText(Point(1,1), "A");
-    canvas.drawText(Point(8,8), "B");
+    canvas.drawText(Point(1,1), "one");
+    canvas.drawText(Point(8,8), "two");
 
     error << canvas.str();
-    return;
+*/
 
     LexerPtr lexer = newLexer();
 
@@ -316,7 +317,7 @@ void MainWindow::on_pushButton_clicked() {
     lexer->addTerminal("", ++id, "[-*/+()]");
     lexer->addTerminal("NAME", ++id, "[_a-zA-Z][_a-zA-Z0-9]*");
 
-    lexer->setSource("1 + 2 * 3 * 4 + 5*6");
+    lexer->setSource("1 + 2 * 3 + 4 * 5 * 6 * 7 + 2 * 3 * 4");
 
     //    lexer->setSource(ui->lineEditHead->text().toStdString());
 
@@ -525,6 +526,8 @@ return 0;}));
 
     NodePtr n = grammar->runPredictiveParser(error,lexer);
     ui->treeGrid->addTree(n);
+    error << ui->treeGrid->textTree() << "\n";
+
 }
 
 }

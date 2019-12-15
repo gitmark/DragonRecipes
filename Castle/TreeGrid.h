@@ -58,16 +58,16 @@ inline Point scale(Point center, float s, Point point) {
 
 class Vec {
 public:
-    Vec(int x = 0, int y = 0) : x(x), y(y) {}
-    int x;
-    int y;
+    Vec(float x = 0, float y = 0) : x(x), y(y) {}
+    float x;
+    float y;
 };
 
 class Size {
 public:
-    Size(int width = 0, int height = 0) : width(width), height(height) {}
-    int width;
-    int height;
+    Size(float width = 0, float height = 0) : width(width), height(height) {}
+    float width;
+    float height;
 };
 
 class NodeDim;
@@ -79,13 +79,18 @@ class TextCanvas {
 public:
     TextCanvas(int rows = 200, int cols = 80) : rows(rows), cols(cols) {
         buf.resize(static_cast<size_t>(rows));
-        for (auto &row : buf) {
-            row.resize(static_cast<size_t>(cols));
-        }
+
+        for (auto &row : buf)
+            row.resize(static_cast<size_t>(cols + 1)); // add one for null char
     }
 
     void drawLine(Point p1, Point p2) {
-
+/*
+        p1.x *= 2.0f;
+        p1.y *= 2.0f;
+        p2.x *= 2.0f;
+        p2.y *= 2.0f;
+*/
         int x1 = std::round(p1.x);
         int y1 = std::round(p1.y);
 
@@ -118,22 +123,37 @@ public:
             ch = "|";
         else
             ch = "-";
-
-        while(x != x2 && y != y2) {
-            drawText(Point(x,y), ch);
+        x -= dx;
+        y -= dy;
+        do {
             x += dx;
             y += dy;
-        }
+            drawText(Point(x,y), ch);
+        } while(x != x2 && y != y2);
+
+
     }
 
     void drawText(Point point, const std::string &text) {
+
+  //      point.x *= 2.0f;
+   //     point.y *= 2.0f;
         if (text.empty())
             return;
 
-        buf[point.y][point.x] = text[0];
-        for (int i = 0; i < point.x; ++i) {
-            if (buf[point.y][i] == 0)
-                buf[point.y][i] = ' ';
+        int x1 = static_cast<int>(std::rint(point.x));
+        int y1 = static_cast<int>(std::rint(point.y));
+
+        int startX = x1 - text.size()/2;
+        int stopX = startX + text.size();
+
+        int j = 0;
+        for (int x = startX; x < stopX; ++x)
+            buf[y1][x] = text[j++];
+
+        for (int i = 0; i < x1; ++i) {
+            if (buf[y1][i] == 0)
+                buf[y1][i] = ' ';
         }
 
     }
@@ -166,6 +186,9 @@ public:
 
     virtual ~NodeDim();
 
+    std::string textTree() {
+        return _canvas->str();
+    }
     int toInt(double d) {
         return static_cast<int>(rint(d));
     }
@@ -175,6 +198,10 @@ public:
     }
 
     void drawLine(Point p1, Point p2) {
+        Point p5 = rotate(_center0, _angle, p1);
+        Point p6 = rotate(_center0, _angle, p2);
+        _canvas->drawLine(p5,p6);
+
         p1.x *= _scale;
         p1.y *= _scale;
 
@@ -183,12 +210,17 @@ public:
 
         Point p3 = rotate(_center, _angle, p1);
         Point p4 = rotate(_center, _angle, p2);
+
         _painter->drawLine(toInt(p3.x), toInt(p3.y), toInt(p4.x), toInt(p4.y));
     }
 
     void drawText(const Point &point, const std::string &text) {
         Point p1(point.x*_scale, point.y*_scale);
         Point p3 = rotate(_center, _angle, p1);
+        Point p4 = rotate(_center0, _angle, point);
+
+        _canvas->drawText(p4, text);
+
         _painter->setBrush(QBrush(QColor(0,0,0)));
         _painter->setPen(QColor(0,0,0));
         float eScale = 2.5f;
@@ -197,12 +229,14 @@ public:
         _painter->drawText(toInt(p3.x - _fontSize/2), toInt(p3.y + _fontSize/2), text.c_str());
     }
 
-    void paint(QPainter &painter, Point center, Point point, float scale, float fontSize) {
+    void paint(QPainter &painter, TextCanvas &canvas, Point center, Point point, float scale, float fontSize) {
         _painter = &painter;
         _scale = scale;
         _angle = -static_cast<float>(M_PI)/4.0f;
-        _center = center;
+        _center0 = center;
+        _center = Point(toInt((_center0.x + 0.5) * _scale), toInt((_center0.y + 0.5) * _scale));
         _fontSize = fontSize;
+        _canvas = &canvas;
 
         float x = point.x;
         float y = point.y;
@@ -219,7 +253,7 @@ public:
             float offset = 0.5;
             painter.setPen(QColor(200,200,200));
             drawLine(Point(x, y), Point(x+edge.x, y+edge.y));
-            ch->paint(painter, _center, Point((x + edge.x), (y + edge.y)), scale, fontSize);
+            ch->paint(painter, canvas, _center0, Point((x + edge.x), (y + edge.y)), scale, fontSize);
         }
 
         painter.setBrush(QBrush(QColor(0,0,0)));
@@ -249,29 +283,29 @@ public:
 
             if (leftSize.width > rightSize.height*0.95) {
 
-            left->setParentEdge(Vec(0, 1 + rightSize.height));
-            right->setParentEdge(Vec(2, 0));
+            left->setParentEdge(Vec(0, 2.828f + rightSize.height));
+            right->setParentEdge(Vec(2.828f, 0));
 
-            int newWidth = std::max(leftSize.width, 2 + rightSize.width);
-            int newHeight = leftSize.height + rightSize.height + 1;
+            int newWidth = std::max(leftSize.width, 2.828f + rightSize.width);
+            int newHeight = leftSize.height + rightSize.height + 2.828f;
 
             _size = Size(newWidth, newHeight);
             } else {
-                left->setParentEdge(Vec(0, 2));
-                right->setParentEdge(Vec(1 + leftSize.width, 0));
+                left->setParentEdge(Vec(0, 2.828f));
+                right->setParentEdge(Vec(2.828f + leftSize.width, 0));
 
-                int newHeight = std::max(leftSize.height, 2 + rightSize.height);
-                int newWidth = leftSize.width + rightSize.width + 1;
+                float newHeight = std::max(leftSize.height + 2.828f, rightSize.height);
+                float newWidth = leftSize.width + rightSize.width + 2.828f;
 
                 _size = Size(newWidth, newHeight);
             }
             return _size;
 
         } else if (_children.size() == 1) {
-            _children[0]->setParentEdge(Vec(1,1));
+            _children[0]->setParentEdge(Vec(1.414f,1.414f));
             _size = _children[0]->size();
         } else {
-            _size = Size(1,1);
+            _size = Size(0.0f,0.0f);
             return _size;
         }
 
@@ -307,7 +341,10 @@ private:
     float _scale{20};
     QPainter *_painter{nullptr};
     Point _center;
+    Point _center0;
     float _fontSize{24};
+    TextCanvas *_canvas;
+
 };
 
 inline NodeDimPtr newNodeDim(NodePtr node) {
@@ -333,6 +370,7 @@ public:
     void addToGrid(int row, int col, SymbolPtr symbol);
     void addToGrid(int row, int col, NodeDimPtr nodeDim);
     void addTree(NodePtr node);
+    std::string textTree();
 
 protected:
     void paintEvent(QPaintEvent * /* event */);
@@ -345,6 +383,8 @@ private:
     size_t height{10};
     std::vector<std::vector<Cell>> grid;
     std::vector<NodeDimPtr> trees;
+    std::string _treeText;
+    TextCanvas textCanvas;
 };
 
 #endif
