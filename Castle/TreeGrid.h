@@ -70,6 +70,15 @@ public:
     float height;
 };
 
+class Rect {
+public:
+    Rect(float x1 = 0, float y1 = 0, float x2 = 0, float y2 = 0) : x1(x1), y1(y1), x2(x2), y2(y2) {}
+    float x1;
+    float y1;
+    float x2;
+    float y2;
+};
+
 class NodeDim;
 
 using NodeDimPtr = std::shared_ptr<NodeDim>;
@@ -152,7 +161,7 @@ public:
             buf[y1][x] = text[j++];
 
         for (int i = 0; i < x1; ++i) {
-            if (buf[y1][i] == 0)
+            if (buf[y1][i] == 0 || buf[y1][i] == '\n')
                 buf[y1][i] = ' ';
         }
 
@@ -173,6 +182,7 @@ private:
     int cols;
     std::vector<std::vector<char>> buf;
 };
+
 
 class NodeDim {
 public:
@@ -201,7 +211,6 @@ public:
     void drawLine(Point p1, Point p2) {
         Point p5 = rotate(_center0, _angle, p1);
         Point p6 = rotate(_center0, _angle, p2);
-        _canvas->drawLine(p5,p6);
 
         p1.x *= _scale;
         p1.y *= _scale;
@@ -215,29 +224,61 @@ public:
         _painter->drawLine(toInt(p3.x), toInt(p3.y), toInt(p4.x), toInt(p4.y));
     }
 
+    void drawLine2(Point p1, Point p2) {
+        Point p5 = rotate(_center0, _angle, p1);
+        Point p6 = rotate(_center0, _angle, p2);
+        _canvas->drawLine(p5,p6);
+    }
+
+
     void drawText(const Point &point, const std::string &text) {
         Point p1(point.x*_scale, point.y*_scale);
         Point p3 = rotate(_center, _angle, p1);
         Point p4 = rotate(_center0, _angle, point);
-
-        _canvas->drawText(p4, text);
 
         _painter->setBrush(QBrush(QColor(0,0,0)));
         _painter->setPen(QColor(0,0,0));
         float eScale = 2.5f;
         _painter->drawEllipse(toInt(p3.x - _fontSize*eScale/2), toInt(p3.y - _fontSize*eScale/2), toInt(_fontSize*eScale), toInt(_fontSize*eScale));
         _painter->setPen(QColor(200,200,200));
-        _painter->drawText(toInt(p3.x - _fontSize/2), toInt(p3.y + _fontSize/2), text.c_str());
+
+        int x = toInt(p4.x);
+        int y = toInt(p4.y);
+        int x1 = x - text.size()/2;
+        int x2 = x1 + text.size() - 1;
+
+        if (x1 < _canvasRect->x1)
+            _canvasRect->x1 = x1;
+
+        if (x2 > _canvasRect->x2)
+            _canvasRect->x2 = x2;
+
+        if (y < _canvasRect->y1)
+            _canvasRect->y1 = y;
+
+        if (y > _canvasRect->y2)
+            _canvasRect->y2 = y;
+
+        int x3 = toInt(p3.x);
+        int y3 = toInt(p3.y);
+
+        _painter->drawText(x3 - text.size()/2 - _fontSize/2, y3 + _fontSize/2, text.c_str());
     }
 
-    void paint(QPainter &painter, TextCanvas &canvas, Point center, Point point, float scale, float fontSize) {
+    void drawText2(const Point &point, const std::string &text) {
+        Point p4 = rotate(_center0, _angle, point);
+        _canvas->drawText(p4, text);
+    }
+
+
+    void paint(QPainter &painter, Rect &canvasRect, Point center, Point point, float scale, float fontSize) {
         _painter = &painter;
         _scale = scale;
         _angle = -static_cast<float>(M_PI)/4.0f;
         _center0 = center;
         _center = Point(toInt((_center0.x + 0.5) * _scale), toInt((_center0.y + 0.5) * _scale));
         _fontSize = fontSize;
-        _canvas = &canvas;
+        _canvasRect = &canvasRect;
 
         float x = point.x;
         float y = point.y;
@@ -254,7 +295,7 @@ public:
             float offset = 0.5;
             painter.setPen(QColor(200,200,200));
             drawLine(Point(x, y), Point(x+edge.x, y+edge.y));
-            ch->paint(painter, canvas, _center0, Point((x + edge.x), (y + edge.y)), scale, fontSize);
+            ch->paint(painter, *_canvasRect, _center0, Point((x + edge.x), (y + edge.y)), scale, fontSize);
         }
 
         painter.setBrush(QBrush(QColor(0,0,0)));
@@ -263,6 +304,36 @@ public:
         painter.setBrush(QBrush(QColor(200,200,200)));
         drawText(point, str);
     }
+
+    void paint(TextCanvas &canvas, Rect &canvasRect, Point center, Point point, float scale, float fontSize) {
+        _scale = scale;
+        _angle = -static_cast<float>(M_PI)/4.0f;
+        _center0 = center;
+        _center = Point(toInt((_center0.x + 0.5) * _scale), toInt((_center0.y + 0.5) * _scale));
+        _fontSize = fontSize;
+        _canvas = &canvas;
+        _canvasRect = &canvasRect;
+
+        float x = point.x;
+        float y = point.y;
+
+        TokenPtr token = std::dynamic_pointer_cast<Token>(node()->symbol());
+        std::string str;
+        if (token)
+            str = token->lexeme();
+        else
+            str = node()->symbol()->name();
+
+        for (auto ch : children()) {
+            Vec edge = ch->parentEdge();
+            float offset = 0.5;
+            drawLine2(Point(x, y), Point(x+edge.x, y+edge.y));
+            ch->paint(canvas, *_canvasRect, _center0, Point((x + edge.x), (y + edge.y)), scale, fontSize);
+        }
+
+        drawText2(point, str);
+    }
+
 
     Vec parentEdge() {
         return _parentEdge;
@@ -345,6 +416,7 @@ private:
     Point _center0;
     float _fontSize{24};
     TextCanvas *_canvas;
+    Rect *_canvasRect;
 
 };
 

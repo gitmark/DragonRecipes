@@ -88,9 +88,7 @@ void TreeGrid::paintEvent(QPaintEvent *)
     if(trees.empty())
         return;
 
-    NodeDimPtr nodeDim = trees.back(); //newNodeDim(n3);
-
-//    addToGrid(0,0,n3);
+    NodeDimPtr nodeDim = trees.back();
 
     QPainter painter(this);
 
@@ -112,7 +110,11 @@ void TreeGrid::paintEvent(QPaintEvent *)
     float scale = 10.0f;
     float fontSize = pointSize/1.7f;
 
-    nodeDim->paint(painter, textCanvas, Point(20, 1), Point(20, 1), scale, fontSize);
+    Rect canvasRect1(1e20f, 1e20f, -1e20f, -1e20f);
+    nodeDim->paint(painter, canvasRect1, Point(20, 1), Point(20, 1), scale, fontSize);
+    Rect canvasRect(1e20f, 1e20f, -1e20f, -1e20f);
+//    nodeDim->paint(painter, canvasRect, Point(20 - canvasRect1.x1, 1), Point(20 - canvasRect1.x1, 1), scale, fontSize);
+    nodeDim->paint(textCanvas, canvasRect, Point(20 - canvasRect1.x1, 1), Point(20 - canvasRect1.x1, 1), scale, fontSize);
     _treeText = nodeDim->textTree();
     /*
     // Draw cells
