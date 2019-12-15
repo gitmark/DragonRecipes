@@ -161,7 +161,8 @@ public:
     std::string str() {
         std::stringstream ss;
         for (int row = 0; row < rows; ++row) {
-            ss << buf[row].data() << "\n";
+            if (buf[row][0] != 0)
+               ss << buf[row].data() << "\n";
         }
 
         return ss.str();
