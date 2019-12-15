@@ -8,6 +8,7 @@
 
 #define _USE_MATH_DEFINES
 
+#include <sstream>
 #include <cmath>
 #include <QWidget>
 #include <QPainter>
@@ -74,6 +75,84 @@ class NodeDim;
 using NodeDimPtr = std::shared_ptr<NodeDim>;
 NodeDimPtr newNodeDim(NodePtr node);
 
+class TextCanvas {
+public:
+    TextCanvas(int rows = 200, int cols = 80) : rows(rows), cols(cols) {
+        buf.resize(static_cast<size_t>(rows));
+        for (auto &row : buf) {
+            row.resize(static_cast<size_t>(cols));
+        }
+    }
+
+    void drawLine(Point p1, Point p2) {
+
+        int x1 = std::round(p1.x);
+        int y1 = std::round(p1.y);
+
+        int x2 = std::round(p2.x);
+        int y2 = std::round(p2.y);
+
+        int dx = x2 - x1;
+        int dy = y2 - y1;
+
+        if (dx > 0)
+            dx = 1;
+        else if (dx < 0)
+            dx = -1;
+
+        if (dy > 0)
+            dy = 1;
+        else if (dy < 0)
+            dy = -1;
+
+        int x = x1;
+        int y = y1;
+
+        std::string ch = ".";
+
+        if (dx == dy)
+            ch = "\\";
+        else if (dx == -dy)
+            ch = "/";
+        else if (dx == 0)
+            ch = "|";
+        else
+            ch = "-";
+
+        while(x != x2 && y != y2) {
+            drawText(Point(x,y), ch);
+            x += dx;
+            y += dy;
+        }
+    }
+
+    void drawText(Point point, const std::string &text) {
+        if (text.empty())
+            return;
+
+        buf[point.y][point.x] = text[0];
+        for (int i = 0; i < point.x; ++i) {
+            if (buf[point.y][i] == 0)
+                buf[point.y][i] = ' ';
+        }
+
+    }
+
+    std::string str() {
+        std::stringstream ss;
+        for (int row = 0; row < rows; ++row) {
+            ss << buf[row].data() << "\n";
+        }
+
+        return ss.str();
+    }
+
+private:
+    int rows;
+    int cols;
+    std::vector<std::vector<char>> buf;
+};
+
 class NodeDim {
 public:
     NodeDim() {}
@@ -95,9 +174,12 @@ public:
         return static_cast<int>(rint(f));
     }
 
-    void drawLine(float x1, float y1, float x2, float y2) {
-        Point p1(x1,y1);
-        Point p2(x2,y2);
+    void drawLine(Point p1, Point p2) {
+        p1.x *= _scale;
+        p1.y *= _scale;
+
+        p2.x *= _scale;
+        p2.y *= _scale;
 
         Point p3 = rotate(_center, _angle, p1);
         Point p4 = rotate(_center, _angle, p2);
@@ -105,7 +187,6 @@ public:
     }
 
     void drawText(const Point &point, const std::string &text) {
-//        Point p1(point.x*_scale + (_scale - _fontSize)/2, point.y*_scale + (_fontSize + _scale)/2);
         Point p1(point.x*_scale, point.y*_scale);
         Point p3 = rotate(_center, _angle, p1);
         _painter->setBrush(QBrush(QColor(0,0,0)));
@@ -137,14 +218,12 @@ public:
             Vec edge = ch->parentEdge();
             float offset = 0.5;
             painter.setPen(QColor(200,200,200));
-//            drawLine((x + offset)*scale, (y + offset)*scale, (x+edge.x + offset)*scale, (y+edge.y + offset)*scale);
-            drawLine((x)*scale, (y)*scale, (x+edge.x)*scale, (y+edge.y)*scale);
+            drawLine(Point(x, y), Point(x+edge.x, y+edge.y));
             ch->paint(painter, _center, Point((x + edge.x), (y + edge.y)), scale, fontSize);
         }
 
         painter.setBrush(QBrush(QColor(0,0,0)));
         painter.setPen(QColor(0,0,0));
-//        painter.drawEllipse(toInt(x*scale), toInt(y*scale), toInt(scale), toInt(scale));
         painter.setPen(QColor(200,200,200));
         painter.setBrush(QBrush(QColor(200,200,200)));
         drawText(point, str);

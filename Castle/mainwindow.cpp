@@ -292,10 +292,21 @@ PrintStack::~PrintStack() {
 
 using namespace log;
 void MainWindow::on_pushButton_clicked() {
+    ui->textEditResults->setFont (QFont ("Courier", 13));
+
+    ui->textEditLog->setFont (QFont ("Courier", 13));
 
     log::error.setListener(newLogListener([&](const std::string &str) {
         ui->textEditLog->setText(ui->textEditLog->toPlainText() + str.c_str());
     }));
+
+    TextCanvas canvas(10,10);
+    canvas.drawLine(Point(1,1),Point(8,8));
+    canvas.drawText(Point(1,1), "A");
+    canvas.drawText(Point(8,8), "B");
+
+    error << canvas.str();
+    return;
 
     LexerPtr lexer = newLexer();
 
@@ -511,9 +522,6 @@ return 0;}));
 
     ui->textEditResults->setText(grammar->toString().c_str());
     log::error.flush();
-    ui->textEditResults->setFont (QFont ("Courier", 13));
-
-    ui->textEditLog->setFont (QFont ("Courier", 13));
 
     NodePtr n = grammar->runPredictiveParser(error,lexer);
     ui->treeGrid->addTree(n);
