@@ -35,8 +35,11 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
-int MainWindow::init(const std::string &filename) {
-    _filename = filename;
+int MainWindow::init(Config *config) {
+    _config = config;
+
+    for(auto &exp : _config->expressions)
+        ui->listExpressions->addItem(exp.c_str());
     return 0;
 }
 
@@ -317,7 +320,9 @@ void MainWindow::on_pushButton_clicked() {
     lexer->addTerminal("", ++id, "[-*/+()]");
     lexer->addTerminal("NAME", ++id, "[_a-zA-Z][_a-zA-Z0-9]*");
 
-    lexer->setSource("1 + 2 * 3 + 4 * 5 * 6 * 7 + 2 * 3 * 4");
+    std::string exp = ui->listExpressions->currentItem()->text().toStdString();
+    lexer->setSource(exp);
+//    lexer->setSource("1 + 2 * 3 + 4 * 5 * 6 * 7 + 2 * 3 * 4");
 
     //    lexer->setSource(ui->lineEditHead->text().toStdString());
 
@@ -509,8 +514,8 @@ return 0;}));
         return;
     }
 
-    std::string head = ui->lineEditHead->text().toStdString();
-    std::string body = ui->lineEditBody->text().toStdString();
+    std::string head; // = ui->lineEditHead->text().toStdString();
+    std::string body; // = ui->lineEditBody->text().toStdString();
     production = std::make_shared<Production>(head, body);
     std::vector<std::string> parts = production->bodyVec();
     std::stringstream ss;
@@ -530,4 +535,9 @@ return 0;}));
 
 }
 
+}
+
+void castle::MainWindow::on_listExpressions_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
+{
+    on_pushButton_clicked();
 }

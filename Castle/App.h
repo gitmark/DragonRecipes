@@ -6,16 +6,24 @@
 #ifndef APP_H
 #define APP_H
 
+#include <iostream>
+#include <fstream>
 #include <memory>
+#include <vector>
 #include <string>
 #include <list>
+#include <map>
+#include <DragonRecipes/StringTools.h>
+#include "Config.h"
+
+using namespace dragon;
 
 namespace castle {
 
 class App {
   public:
     App();
-
+    virtual ~App();
     static std::shared_ptr<App> create();
     virtual int run(int argc, char **argv);
     virtual int parseArgs(int argc, char **argv);
@@ -30,10 +38,15 @@ class App {
     std::string _versionNum;
     std::string _devStage;
     std::string _usage;
-    std::string _filename;
     int _error{0};
 
     static std::weak_ptr<App> _theApp;
+    std::string _homeDir;
+    std::string _defaultConfigFilename;
+    std::string _configFilename;
+    std::string _defaultConfigContent;
+    Config _config;
+    std::vector<std::string> expressions;
 };
 
 }

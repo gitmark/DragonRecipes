@@ -8,7 +8,9 @@
 
 #include <memory>
 #include <QMainWindow>
+#include <QListWidgetItem>
 #include <DragonRecipes.h>
+#include "Config.h"
 
 using namespace dragon;
 
@@ -31,7 +33,7 @@ class MainWindow : public QMainWindow {
     MainWindow &operator=(MainWindow &&mainWindow) noexcept = delete;
 
     ~MainWindow() override;
-    int init(const std::string &filename);
+    int init(Config *config);
 
   private:
     std::shared_ptr<Production> production;
@@ -40,9 +42,12 @@ class MainWindow : public QMainWindow {
   private slots:
     void on_pushButton_clicked();
 
-  private:
+    void on_listExpressions_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
+
+private:
     Ui::MainWindow *ui;
     std::string textTree;
+    Config *_config;
 };
 
 }

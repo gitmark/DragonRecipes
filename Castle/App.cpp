@@ -3,6 +3,8 @@
    distributed under the MIT License. See LICENSE.TXT for details.
   --------------------------------------------------------------------------*/
 
+#include <sys/stat.h>
+#include <cstdlib>
 #include <cerrno>
 #include <cstring>
 #include <getopt.h>
@@ -23,19 +25,84 @@
 #include <QCoreApplication>
 #include <DragonRecipes/Production.h>
 #include <DragonRecipes/Version.h>
+#include <DragonRecipes/StringTools.h>
+
 #include "App.h"
 #include "Version.h"
 #include "mainwindow.h"
-
+using namespace dragon;
 namespace castle {
+
+bool fileExists(const std::string &filename) {
+// https://stackoverflow.com/questions/12774207/fastest-way-to-check-if-a-file-exist-using-standard-c-c11-c
+    struct stat buffer;
+    return (stat (filename.c_str(), &buffer) == 0);
+}
+
+int makeDir(const std::string &inPath) {
+
+    std::string path = trim(inPath);
+    std::vector<std::string> parts;
+    split(path, "/", parts);
+
+    bool absolutePath = false;
+
+    if (!path.empty() && path.front() == '/')
+        absolutePath = true;
+
+    std::string currentPath;
+    for (size_t i = 0; i < parts.size(); ++i) {
+        auto &p = parts[i];
+        if (p.empty()) {
+            continue;
+        }
+
+        if (i == 0) {
+            if (absolutePath)
+                currentPath += "/";
+        } else {
+            currentPath += "/";
+        }
+
+        currentPath += p;
+
+        if (p == ".." || p == ".")
+            continue;
+
+        if (!fileExists(currentPath)) {
+            int rc = mkdir(currentPath.c_str(), 0777);
+            if (rc == -1) {
+                std::cerr << "error: " << strerror(errno) << "\n";
+                return 1;
+            }
+        }
+    }
+
+    return 0;
+}
+
 
 std::weak_ptr<App> App::_theApp;
 
 App::App() :
     _versionNum(appVersion()),
     _devStage(appDevStage())
-{}
+{
+    _homeDir = std::getenv("HOME");
+    _defaultConfigFilename = _homeDir + "/.castle.conf";
+    _configFilename = _defaultConfigFilename;
+    _defaultConfigContent = ";Castle config settings\n"
+                            "[dirs]\n"
+                            "docs=Documents/Castle\n"
+                            "[files]\n"
+                            "expressions=expressions.txt\n"
+                            "\n";
+}
 
+
+App::~App() {
+
+}
 
 int App::parseArgs(int argc, char **argv) {
     std::string optLong;
@@ -69,7 +136,7 @@ int App::parseArgs(int argc, char **argv) {
 
         case 'c':
             optLong = long_options[static_cast<size_t>(option_index)].name;
-            _filename = optarg;
+            _configFilename = optarg;
             break;
 
         case 'v':
@@ -145,6 +212,72 @@ int App::run(int argc, char **argv) {
     if (_help || _version)
         return 0;
 
+    if (!fileExists(_configFilename)) {
+        std::cerr << "error: config file does not exist '" << _configFilename << "'.\n";
+
+        if (_configFilename != _defaultConfigFilename) {
+            return 1;
+        }
+
+        _configFilename = trim(_configFilename);
+
+        bool absolutePath = false;
+
+        if (!_configFilename.empty() && _configFilename.front() == '/')
+            absolutePath = true;
+
+        std::cerr << "error: trying to create default config file now '" << _configFilename << "'\n";
+
+        if (!_configFilename.empty() && _configFilename.back() != '/') {
+            std::vector<std::string> parts;
+            split(_configFilename, "/", parts);
+            std::string path;
+
+            for (size_t i = 0; i < parts.size() - 1; ++i) {
+                auto &p = parts[i];
+                if (p.empty()) {
+                    continue;
+                }
+
+                if (i == 0) {
+                    if (absolutePath)
+                        path += "/";
+                } else {
+                    path += "/";
+                }
+
+                path += p;
+            }
+
+            rc = makeDir(path);
+            if (rc != 0) {
+                std::cerr << "error: could not create config file directory '" << path << "'\n";
+                return rc;
+            }
+
+            std::ofstream outfile(_configFilename);
+            if (!outfile.good()) {
+                std::cerr << "error: could not open config file for writing '" << _configFilename << "'\n";
+                return 1;
+            }
+            outfile << _defaultConfigContent;
+        } else {
+            std::cerr << "error: config filename is not valid '" << _configFilename << "'\n";
+            return 1;
+        }
+    }
+
+    ///////////
+
+
+
+    rc = _config.loadFile(_configFilename);
+
+    if (rc != 0)
+        return rc;
+
+    std::cout << "data[dirs][docs] = "  << _config.data["dirs"]["docs"] << "\n";
+
     QApplication a(argc, argv);
     QDir dir(QCoreApplication::applicationDirPath());
     dir.cdUp();
@@ -152,7 +285,7 @@ int App::run(int argc, char **argv) {
     QCoreApplication::setLibraryPaths(QStringList(dir.absolutePath()));
     QApplication::setWindowIcon(QIcon(":/images/castle.icns"));
     MainWindow w;
-    w.init(_filename);
+    w.init(&_config);
     w.show();
     return QApplication::exec();
 }
