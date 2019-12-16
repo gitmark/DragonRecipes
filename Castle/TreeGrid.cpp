@@ -108,7 +108,7 @@ void TreeGrid::paintEvent(QPaintEvent *)
     int pointSize = 12;
     painter.setFont(QFont("Courier", pointSize));
     float scale = 10.0f;
-    float fontSize = pointSize/1.7f;
+    float fontSize = pointSize/1.5f;
 
     Rect canvasRect1(1e20f, 1e20f, -1e20f, -1e20f);
 
