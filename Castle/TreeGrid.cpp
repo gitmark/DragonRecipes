@@ -9,6 +9,7 @@
 #include <DragonRecipes/Node.h>
 #include <DragonRecipes/Symbol.h>
 #include <DragonRecipes/Token.h>
+#include <DragonRecipes/TextPainter.h>
 #include "QtPainter.h"
 
 using namespace dragon;
@@ -113,9 +114,11 @@ void TreeGrid::paintEvent(QPaintEvent *)
 
     nodeDim->paint(newPainter(painter), canvasRect1, Point(20, 1), Point(20, 1), scale, fontSize);
     Rect canvasRect(1e20f, 1e20f, -1e20f, -1e20f);
+
 //    nodeDim->paint(painter, canvasRect, Point(20 - canvasRect1.x1, 1), Point(20 - canvasRect1.x1, 1), scale, fontSize);
-    nodeDim->paint(textCanvas, canvasRect, Point(20 - canvasRect1.x1, 1), Point(20 - canvasRect1.x1, 1), scale, fontSize);
-    _treeText = nodeDim->textTree();
+    TextCanvas textCanvas;
+    nodeDim->paint(newPainter(textCanvas), canvasRect, Point(20 - canvasRect1.x1, 1), Point(20 - canvasRect1.x1, 1), 1, 0);
+    _treeText = textCanvas.str();
     /*
     // Draw cells
     for(size_t row = 0; row <= height; ++row) {

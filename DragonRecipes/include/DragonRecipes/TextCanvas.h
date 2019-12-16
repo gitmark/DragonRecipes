@@ -24,6 +24,11 @@ public:
             row.resize(static_cast<size_t>(cols + 1)); // add one for null char
     }
 
+    void clear() {
+        for (auto &row : buf)
+            std::memset(row.data(), 0, row.size());
+    }
+
     void drawLine(Point p1, Point p2) {
         /*
         p1.x *= 2.0f;

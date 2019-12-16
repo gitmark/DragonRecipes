@@ -116,6 +116,9 @@ public:
         _scale = scale;
         _angle = -static_cast<float>(M_PI)/4.0f;
         _center0 = center;
+        if (fontSize == 0.0f)
+        _center = Point(toInt((_center0.x) * _scale), toInt((_center0.y) * _scale));
+        else
         _center = Point(toInt((_center0.x + 0.5f) * _scale), toInt((_center0.y + 0.5f) * _scale));
         _fontSize = fontSize;
         _canvasRect = &canvasRect;

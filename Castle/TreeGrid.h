@@ -49,7 +49,7 @@ private:
     std::vector<std::vector<Cell>> grid;
     std::vector<NodeDimPtr> trees;
     std::string _treeText;
-    TextCanvas textCanvas;
+//    TextCanvas textCanvas;
 };
 
 }
