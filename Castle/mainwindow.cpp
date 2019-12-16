@@ -19,7 +19,7 @@
 #include <DragonRecipes/Error.h>
 #include <DragonRecipes/Lexer.h>
 #include <DragonRecipes/Node.h>
-#include "mainwindow.h"
+#include "MainWindow.h"
 #include "ui_mainwindow.h"
 
 using namespace dragon;

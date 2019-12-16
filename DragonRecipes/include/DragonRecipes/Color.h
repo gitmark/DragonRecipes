@@ -3,16 +3,22 @@
    distributed under the MIT License. See LICENSE.TXT for details.
   --------------------------------------------------------------------------*/
 
-#ifndef DRAGON_VERSION_H
-#define DRAGON_VERSION_H
+#ifndef COLOR_H
+#define COLOR_H
 
-#include <string>
 #include <DragonRecipes/Common.h>
 
 namespace dragon {
 
-DRAGON_EXPORT std::string dragonRecipesVersion();
-DRAGON_EXPORT std::string dragonRecipesDevStage();
+class DRAGON_EXPORT Color {
+public:
+    Color(int red = 0, int green = 0, int blue = 0, int alpha = 255) : red(red), green(green), blue(blue), alpha(alpha) {}
+
+    int red;
+    int green;
+    int blue;
+    int alpha;
+};
 
 }
 

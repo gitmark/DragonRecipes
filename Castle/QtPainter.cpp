@@ -3,17 +3,12 @@
    distributed under the MIT License. See LICENSE.TXT for details.
   --------------------------------------------------------------------------*/
 
-#ifndef DRAGON_VERSION_H
-#define DRAGON_VERSION_H
+#include "QtPainter.h"
 
-#include <string>
-#include <DragonRecipes/Common.h>
+namespace castle {
 
-namespace dragon {
-
-DRAGON_EXPORT std::string dragonRecipesVersion();
-DRAGON_EXPORT std::string dragonRecipesDevStage();
-
+QtPainter::~QtPainter() {
+    painter = nullptr;
 }
 
-#endif
+}

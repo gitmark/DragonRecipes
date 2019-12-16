@@ -62,10 +62,10 @@
      </layout>
     </item>
     <item>
-     <widget class="TreeGrid" name="treeGrid" native="true">
+     <widget class="castle::TreeGrid" name="treeGrid" native="true">
       <property name="minimumSize">
        <size>
-        <width>300</width>
+        <width>0</width>
         <height>200</height>
        </size>
       </property>
@@ -87,7 +87,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>TreeGrid</class>
+   <class>castle::TreeGrid</class>
    <extends>QWidget</extends>
    <header>TreeGrid.h</header>
    <container>1</container>

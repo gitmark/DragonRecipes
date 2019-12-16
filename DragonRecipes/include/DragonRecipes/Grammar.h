@@ -12,7 +12,7 @@
 #include <map>
 #include <set>
 #include <map>
-#include <DragonRecipes/Constants.h>
+#include <DragonRecipes/Common.h>
 #include <DragonRecipes/Symbol.h>
 #include <DragonRecipes/Token.h>
 #include <DragonRecipes/Production.h>

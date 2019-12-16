@@ -9,7 +9,7 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include <DragonRecipes/Constants.h>
+#include <DragonRecipes/Common.h>
 #include <DragonRecipes/Symbol.h>
 
 namespace dragon {

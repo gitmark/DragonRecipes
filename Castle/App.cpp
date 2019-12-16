@@ -29,7 +29,7 @@
 
 #include "App.h"
 #include "Version.h"
-#include "mainwindow.h"
+#include "MainWindow.h"
 using namespace dragon;
 namespace castle {
 

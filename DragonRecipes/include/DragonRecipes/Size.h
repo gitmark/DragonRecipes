@@ -3,16 +3,19 @@
    distributed under the MIT License. See LICENSE.TXT for details.
   --------------------------------------------------------------------------*/
 
-#ifndef DRAGON_VERSION_H
-#define DRAGON_VERSION_H
+#ifndef SIZE_H
+#define SIZE_H
 
-#include <string>
 #include <DragonRecipes/Common.h>
 
 namespace dragon {
 
-DRAGON_EXPORT std::string dragonRecipesVersion();
-DRAGON_EXPORT std::string dragonRecipesDevStage();
+class DRAGON_EXPORT Size {
+public:
+    Size(float width = 0, float height = 0) : width(width), height(height) {}
+    float width;
+    float height;
+};
 
 }
 

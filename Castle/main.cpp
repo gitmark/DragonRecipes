@@ -3,7 +3,7 @@
    distributed under the MIT License. See LICENSE.TXT for details.
   --------------------------------------------------------------------------*/
 
-#include "mainwindow.h"
+#include "MainWindow.h"
 #include <QApplication>
 #include <QDir>
 #include <QCoreApplication>

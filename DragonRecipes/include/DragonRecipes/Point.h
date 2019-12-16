@@ -3,16 +3,19 @@
    distributed under the MIT License. See LICENSE.TXT for details.
   --------------------------------------------------------------------------*/
 
-#ifndef DRAGON_VERSION_H
-#define DRAGON_VERSION_H
+#ifndef POINT_H
+#define POINT_H
 
-#include <string>
 #include <DragonRecipes/Common.h>
 
 namespace dragon {
 
-DRAGON_EXPORT std::string dragonRecipesVersion();
-DRAGON_EXPORT std::string dragonRecipesDevStage();
+class DRAGON_EXPORT Point {
+public:
+    Point(float x = 0, float y = 0) : x(x), y(y) {}
+    float x;
+    float y;
+};
 
 }
 

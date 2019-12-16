@@ -3,16 +3,22 @@
    distributed under the MIT License. See LICENSE.TXT for details.
   --------------------------------------------------------------------------*/
 
-#ifndef DRAGON_VERSION_H
-#define DRAGON_VERSION_H
+#ifndef CELL_H
+#define CELL_H
 
 #include <string>
 #include <DragonRecipes/Common.h>
 
 namespace dragon {
 
-DRAGON_EXPORT std::string dragonRecipesVersion();
-DRAGON_EXPORT std::string dragonRecipesDevStage();
+class DRAGON_EXPORT Cell {
+public:
+    Cell(const std::string &str = "", int usage = 0)
+        : str(str), usage(usage) {}
+
+    std::string str;
+    int usage;
+};
 
 }
 

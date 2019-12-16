@@ -3,16 +3,20 @@
    distributed under the MIT License. See LICENSE.TXT for details.
   --------------------------------------------------------------------------*/
 
-#ifndef DRAGON_VERSION_H
-#define DRAGON_VERSION_H
+#ifndef BRUSH_H
+#define BRUSH_H
 
-#include <string>
+#include <DragonRecipes/Color.h>
 #include <DragonRecipes/Common.h>
 
 namespace dragon {
 
-DRAGON_EXPORT std::string dragonRecipesVersion();
-DRAGON_EXPORT std::string dragonRecipesDevStage();
+class DRAGON_EXPORT Brush {
+public:
+    Brush(Color color) : color(color) {}
+
+    Color color;
+};
 
 }
 

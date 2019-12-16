@@ -9,7 +9,7 @@
 #include <string>
 #include <memory>
 #include <DragonRecipes/Token.h>
-#include <DragonRecipes/Constants.h>
+#include <DragonRecipes/Common.h>
 
 namespace dragon {
 

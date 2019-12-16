@@ -9,12 +9,11 @@
 #include <DragonRecipes/Node.h>
 #include <DragonRecipes/Symbol.h>
 #include <DragonRecipes/Token.h>
+#include "QtPainter.h"
 
 using namespace dragon;
 
-NodeDim::~NodeDim() {
-    _children.clear();
-}
+namespace castle {
 
 TreeGrid::TreeGrid(QWidget *parent) : QWidget(parent)
 {
@@ -111,7 +110,8 @@ void TreeGrid::paintEvent(QPaintEvent *)
     float fontSize = pointSize/1.7f;
 
     Rect canvasRect1(1e20f, 1e20f, -1e20f, -1e20f);
-    nodeDim->paint(painter, canvasRect1, Point(20, 1), Point(20, 1), scale, fontSize);
+
+    nodeDim->paint(newPainter(painter), canvasRect1, Point(20, 1), Point(20, 1), scale, fontSize);
     Rect canvasRect(1e20f, 1e20f, -1e20f, -1e20f);
 //    nodeDim->paint(painter, canvasRect, Point(20 - canvasRect1.x1, 1), Point(20 - canvasRect1.x1, 1), scale, fontSize);
     nodeDim->paint(textCanvas, canvasRect, Point(20 - canvasRect1.x1, 1), Point(20 - canvasRect1.x1, 1), scale, fontSize);
@@ -140,3 +140,7 @@ void TreeGrid::paintEvent(QPaintEvent *)
     }
 */
 }
+
+}
+
+

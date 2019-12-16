@@ -3,17 +3,12 @@
    distributed under the MIT License. See LICENSE.TXT for details.
   --------------------------------------------------------------------------*/
 
-#ifndef DRAGON_VERSION_H
-#define DRAGON_VERSION_H
-
-#include <string>
-#include <DragonRecipes/Common.h>
+#include <DragonRecipes/NodeDim.h>
 
 namespace dragon {
 
-DRAGON_EXPORT std::string dragonRecipesVersion();
-DRAGON_EXPORT std::string dragonRecipesDevStage();
-
+NodeDim::~NodeDim() {
+    _children.clear();
 }
 
-#endif
+}

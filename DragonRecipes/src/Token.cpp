@@ -18,7 +18,9 @@ namespace dragon {
 class TokenPrivate : public SymbolPrivate {
   public:
       TokenPrivate(const std::string &_name = "", int _id = 0, const std::string &lexeme = "", int line = 0, int col = 0) :
-          SymbolPrivate(_name, _id, Symbol::term), lexeme(lexeme), line(line), col(col) {}
+          SymbolPrivate(_name, _id, Symbol::term), col(col), lexeme(lexeme), line(line)  {}
+
+      virtual ~TokenPrivate();
 
 private:
     int col;
@@ -30,6 +32,10 @@ private:
 
     friend class Token;
 };
+
+TokenPrivate::~TokenPrivate() {
+    lexeme.clear();
+}
 
 Token::Token(const std::string &name, int id, const std::string &lexeme, int line, int col) :
     Symbol(std::make_unique<TokenPrivate>(name, id, lexeme, line, col)) {
